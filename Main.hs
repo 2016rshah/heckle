@@ -1,43 +1,57 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 
+--Stuff for BlazeHTML
+import Control.Monad (forM_)
+
+import Text.Blaze.Html5 as H hiding (main, map)
+import Text.Blaze.Html5.Attributes as A
+import Text.Blaze.Html.Renderer.String
+
+--Stuff for HaTeX
 import Text.LaTeX
 import Text.LaTeX.Base.Parser
 import Text.LaTeX.Base.Syntax
 import Data.Text (unlines, pack, unpack)
 import qualified Data.Text.IO as T
 
+--Other stuff I'm using
 import System.Directory
 import Data.List.Split
 import Data.Maybe
-import Data.Monoid
+--import Data.Monoid
 import Control.Applicative
 
-type LI = String
+instance Show Html where
+  show = renderHtml
 
-type PDF = String -- Is just the name of a pdf enough?
--- data PDF = PDF String
---          deriving (Show, Eq)
+postsToHtml :: [Post] -> Html
+postsToHtml xs = do
+  ul ! class_ "blog-posts" $
+    forM_ xs h
+  where
+    h s = li ! class_ "blog-post" $
+          a ! href (stringValue ("posts/"++fileName s++".pdf")) $
+          toHtml (postTitle s)
+          
+type PDF = String
 
 data Post = Post {
   fileName :: String
-  , author :: String
-  , date :: String
+  , postTitle :: String
+  , postAuthor :: String
+  , postDate :: String
   , syntaxTree :: LaTeX
     }
 
 instance Show Post where
-  show (Post fn a d _) = fn ++ " written by " ++ (a) ++ " on " ++ (d)
+  show (Post fn t a d _) = t ++ " written by " ++ (a) ++ " on " ++ (d)
 
 getPDF :: FilePath -> Maybe PDF
 --getPDF xs = if splitUp !! 1 == "pdf" then Just (PDF (splitUp !! 0)) else Nothing
 getPDF xs = if splitUp !! 1 == "pdf" then Just (splitUp !! 0) else Nothing
   where splitUp = splitOn "." xs
-
-makeLI :: FilePath -> LI
-makeLI s = "<li class='blog-post-link'><a href='posts/"++s++".pdf'>"++s++"</a></li>"
-
-compileUL :: [LI] -> String
-compileUL xs = "<ul class='blog-posts'>" ++ (mconcat xs) ++ "</ul>"
 
 extractCommandArgs :: String -> LaTeX -> Maybe [TeXArg]
 extractCommandArgs s (TeXSeq lt rt) = if isJust lst then lst else rst
@@ -56,19 +70,18 @@ getCommandValue s = (fmap extractFromArgs . extractCommandArgs s)
 
 createPost :: String -> Either ParseError LaTeX -> Maybe Post
 createPost _ (Left err) = Nothing
-createPost s (Right t) = Post <$> pure s <*> author <*> date <*> pure t
+createPost s (Right t) = Post <$> pure s <*> title <*> author <*> date <*> pure t
   where 
     date = fmap unpack (getCommandValue "date" t)
     author = fmap unpack (getCommandValue "author" t)
+    title = fmap unpack (getCommandValue "title" t)
+
+fileNameToPost fn = do
+  latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
+  return (createPost "post1" latexFile)
 
 main = do
-  inp <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
-  print inp
-  let lis = (map makeLI inp)
-  print lis
-  let ul = compileUL lis
-  print ul
-  writeFile "index.html" ul
-
-  latexFile <- fmap (parseLaTeX . pack) (readFile "posts/post1.tex")
-  print $ (createPost "post1" latexFile)
+  fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
+  posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
+  print posts
+  print $ postsToHtml posts
