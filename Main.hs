@@ -85,4 +85,6 @@ main = do
   fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
   posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
   print posts
-  print $ postsToHtml posts
+  let generatedHtml = postsToHtml posts
+  print generatedHtml
+  writeFile "index.html" (show generatedHtml)
