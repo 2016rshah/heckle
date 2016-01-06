@@ -5,7 +5,7 @@ Markdown and HTML are the standard tools used to write your every day tech blog 
 #Jekyll for LaTeX
 BlaTeX is basically Jekyll for LaTeX and thus a lot of the same benefits apply:
 
- >~~Jekyll~~BlaTeX is a simple, blog-aware, static site generator. It takes a template directory containing ~~raw text files in various formats~~ LaTeX files, ~~runs it through a converter (like Markdown) and our Liquid renderer,~~ and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. ~~Jekyll also happens to be the engine behind GitHub Pages, which means~~ you can use ~~Jekyll~~BlaTeX to host your project’s page, blog, or website from GitHub’s servers for free.
+ >~~Jekyll~~ BlaTeX is a simple, blog-aware, static site generator. It takes a template directory containing ~~raw text files in various formats~~ LaTeX files, ~~runs it through a converter (like Markdown) and our Liquid renderer,~~ and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. ~~Jekyll also happens to be the engine behind GitHub Pages, which means~~ you can use ~~Jekyll~~ BlaTeX to host your project’s page, blog, or website from GitHub’s servers for free.
 
 #How To
 The tool is still under heavy development, but basically the idea is that starting a new blog will work like this:

@@ -76,6 +76,7 @@ createPost s (Right t) = Post <$> pure s <*> title <*> author <*> date <*> pure 
     author = fmap unpack (getCommandValue "author" t)
     title = fmap unpack (getCommandValue "title" t)
 
+fileNameToPost :: [Char] -> IO (Maybe Post) 
 fileNameToPost fn = do
   latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
   return (createPost "post1" latexFile)
