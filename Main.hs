@@ -20,7 +20,6 @@ import qualified Data.Text.IO as T
 import System.Directory
 import Data.List.Split
 import Data.Maybe
---import Data.Monoid
 import Control.Applicative
 
 instance Show Html where
@@ -35,8 +34,6 @@ postsToHtml xs = do
           a ! href (stringValue ("posts/"++fileName s++".pdf")) $
           toHtml (postTitle s)
           
-type PDF = String
-
 data Post = Post {
   fileName :: String
   , postTitle :: String
@@ -48,7 +45,7 @@ data Post = Post {
 instance Show Post where
   show (Post fn t a d _) = t ++ " written by " ++ (a) ++ " on " ++ (d)
 
-getPDF :: FilePath -> Maybe PDF
+getPDF :: FilePath -> Maybe String
 --getPDF xs = if splitUp !! 1 == "pdf" then Just (PDF (splitUp !! 0)) else Nothing
 getPDF xs = if splitUp !! 1 == "pdf" then Just (splitUp !! 0) else Nothing
   where splitUp = splitOn "." xs
@@ -76,7 +73,7 @@ createPost s (Right t) = Post <$> pure s <*> title <*> author <*> date <*> pure 
     author = fmap unpack (getCommandValue "author" t)
     title = fmap unpack (getCommandValue "title" t)
 
-fileNameToPost :: [Char] -> IO (Maybe Post) 
+fileNameToPost :: String -> IO (Maybe Post) 
 fileNameToPost fn = do
   latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
   return (createPost "post1" latexFile)
