@@ -4,16 +4,15 @@
 name:                blatex
 version:             0.1.0.0
 synopsis:            Blog from the comfort of LaTeX
--- description:         
-homepage:            rshah.org
--- license:             
+description:         Generate a blog that can be published to github pages from your LaTeX/PDF files
+homepage:            https://github.com/2016rshah/BlaTeX
+license:             MIT
 license-file:        LICENSE
 author:              Rushi Shah
 maintainer:          2016rshah@gmail.com
 -- copyright:           
 category:            Web
 build-type:          Simple
--- extra-source-files:  
 cabal-version:       >=1.10
 
 executable blatex
@@ -29,3 +28,7 @@ executable blatex
                      , text >=1.1 && <1.2
   -- hs-source-dirs:      
   default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/2016rshah/BlaTeX.git
