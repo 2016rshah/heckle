@@ -5,6 +5,6 @@
   <body>
     <h1>Ride wit me though the journey of more success</h1>
     <p>Each blog post is a major key to success:</p>
-    <ul class="blog-posts"><li class="blog-post"><a href="posts/post1.pdf">Sample Blog Post</a></li></ul>
+    <ul id='blog-posts'></ul>
   </body>
 </html>
