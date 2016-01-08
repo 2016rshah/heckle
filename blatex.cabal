@@ -25,6 +25,7 @@ executable blatex
                      , blaze-html >= 0.8.1.1
                      , directory >=1.2 && <1.3
                      , split >=0.2 && <0.3
+                     , tagsoup >= 0.13.3
                      , text >=1.1 && <1.2
   -- hs-source-dirs:      
   default-language:    Haskell2010
