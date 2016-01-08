@@ -16,6 +16,9 @@ import Text.LaTeX.Base.Syntax
 import Data.Text (unlines, pack, unpack)
 import qualified Data.Text.IO as T
 
+--Stuff for TagSoup
+import Text.HTML.TagSoup
+
 --Other stuff I'm using
 import System.Directory
 import Data.List.Split
@@ -46,7 +49,6 @@ instance Show Post where
   show (Post fn t a d _) = t ++ " written by " ++ (a) ++ " on " ++ (d)
 
 getPDF :: FilePath -> Maybe String
---getPDF xs = if splitUp !! 1 == "pdf" then Just (PDF (splitUp !! 0)) else Nothing
 getPDF xs = if splitUp !! 1 == "pdf" then Just (splitUp !! 0) else Nothing
   where splitUp = splitOn "." xs
 
@@ -78,10 +80,19 @@ fileNameToPost fn = do
   latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
   return (createPost "post1" latexFile)
 
+injectPosts :: String -> Html -> String 
+injectPosts layout ul = renderTags (beginning ++ parseTags (show ul) ++ end)
+  where
+    splitFile = splitOn [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] (parseTags layout)
+    beginning = splitFile !! 0
+    end = splitFile !! 1
+
 main = do
   fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
   posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
-  print posts
+  --print posts
   let generatedHtml = postsToHtml posts
-  print generatedHtml
-  writeFile "index.html" (show generatedHtml)
+  --print generatedHtml
+  layoutFile <- readFile "index.html.bltx"
+  let outputFile = layoutFile `injectPosts` generatedHtml
+  writeFile "index.html" outputFile
