@@ -41,7 +41,10 @@ $ git add .; git commit -m 'Started a blog!'; git push origin gh-pages
  - ~~Templates for index page that I can insert HTML into~~
  - Modularize code to separate different tasks (extracting info from LaTeX files, creating HTML elements, inserting HTML into layout, etc.)
  - ~~Insert the generated HTML into the layout file~~
- - Push to hackage
+ - ~~Push to hackage~~
  - ~~Add command line options~~
  - Add command line option called `init` to set up a bare-bones blog with dummy text and stuff
+   - Create a basic template HTML file that's decently pretty, but basic
+   - ~~Create a couple sample blog posts~~
+   - Be able to create them from Haskell
  - Format the code before inserting it into the HTML
