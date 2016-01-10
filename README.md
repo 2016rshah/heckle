@@ -44,7 +44,8 @@ $ git add .; git commit -m 'Started a blog!'; git push origin gh-pages
  - ~~Push to hackage~~
  - ~~Add command line options~~
  - Add command line option called `init` to set up a bare-bones blog with dummy text and stuff
-   - Create a basic template HTML file that's decently pretty, but basic
+   - ~~Create a basic template HTML file that's decently pretty, but basic~~
    - ~~Create a couple sample blog posts~~
    - Be able to create them from Haskell
  - Format the code before inserting it into the HTML
+ - Constantly watch layout and posts directory to rebuild on change
