@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                blatex
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Blog in LaTeX
 description:         Static site generator that lets you write your blog in LaTeX and publish it to github pages.
 description:         Markdown and HTML are the standard tools used to write your every day tech blog with. But they have pretty weak support for embedding mathematical formulas, and are not conducive to writing for an extended period of time. Plus, they aren't even Turing complete! So use BlaTeX to start blogging in LaTeX!
