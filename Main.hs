@@ -31,7 +31,7 @@ instance Show Html where
 
 postsToHtml :: [Post] -> Html
 postsToHtml xs = do
-  ul ! class_ "blog-posts" $
+  ul ! A.id "blog-posts" $
     forM_ xs h
   where
     h s = li ! class_ "blog-post" $
