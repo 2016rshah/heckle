@@ -20,10 +20,11 @@ import qualified Data.Text.IO as T
 import Text.HTML.TagSoup
 
 --Other stuff I'm using
-import System.Directory
+import System.Directory (getDirectoryContents) 
 import Data.List.Split
 import Data.Maybe
 import Control.Applicative
+import System.Environment (getArgs)
 
 instance Show Html where
   show = renderHtml
@@ -88,11 +89,33 @@ injectPosts layout ul = renderTags (beginning ++ parseTags (show ul) ++ end)
     end = splitFile !! 1
 
 main = do
-  fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
-  posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
-  --print posts
-  let generatedHtml = postsToHtml posts
-  --print generatedHtml
-  layoutFile <- readFile "index.html.bltx"
-  let outputFile = layoutFile `injectPosts` generatedHtml
-  writeFile "index.html" outputFile
+  args <- getArgs
+  case args of
+    ["build"] -> do
+      --get all pdf files from directory
+      putStrLn "Getting directory contents"
+      fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
+
+      --turn the list of files into a list of posts
+      putStrLn "Turning directory contents into posts"
+      posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
+
+      --generate a ul from the list of posts
+      putStrLn "Turning posts into an HTML element"
+      let generatedHtml = postsToHtml posts
+
+      --read the layout file
+      putStrLn "Reading the layout file"
+      layoutFile <- readFile "index.html.bltx"
+
+      --put the ul into the layout file
+      putStrLn "Inserting HTML element into layout file"
+      let outputFile = layoutFile `injectPosts` generatedHtml
+
+      --put the results into the index.html file
+      putStrLn "Writing resulting file into index.html"
+      writeFile "index.html" outputFile
+
+      putStrLn "Success!"
+    ["init"] -> print "Not implemented yet..."
+    _ -> print "That's not a valid command"

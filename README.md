@@ -42,6 +42,6 @@ $ git add .; git commit -m 'Started a blog!'; git push origin gh-pages
  - Modularize code to separate different tasks (extracting info from LaTeX files, creating HTML elements, inserting HTML into layout, etc.)
  - ~~Insert the generated HTML into the layout file~~
  - Push to hackage
- - Add command line options
+ - ~~Add command line options~~
  - Add command line option called `init` to set up a bare-bones blog with dummy text and stuff
  - Format the code before inserting it into the HTML
