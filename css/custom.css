@@ -1,0 +1,30 @@
+ul{
+	text-align:center;
+	font-size:4rem;
+	list-style-type:none
+}
+
+.header{
+	margin-top:10%;
+}
+
+.link{
+  margin-left:0px;
+}
+
+.prof-pic{
+	border-radius:50%;
+	height:175px;
+	width:175px;
+}
+
+a {
+	color:#000;
+}	
+
+.fancy-font{
+	font-family: "Bad Script", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+body{
+	text-align:center;
+}
