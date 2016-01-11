@@ -1,3 +1,15 @@
+.container {
+    position: relative;
+    min-height: 100%;
+}
+footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 25px;
+    width: 100%;
+}
+
 ul{
 	font-size:4rem;
 	list-style-type:none
@@ -28,11 +40,12 @@ body{
 .container {
   max-width: 900px; }
 .header {
-  margin-top:10%;
+  /*margin-top:5%;*/
   text-align: center; }
 .section {
   border-top: 1px solid #eee;
-  padding: 4rem 0;
+  padding: 4rem;
+  padding-top: 4rem;
   margin-bottom: 0;}
 .navbar {
   display: none; }
@@ -41,9 +54,10 @@ body{
 /* Larger than phone */
 @media (min-width: 550px) {
   .header {
-    margin-top: 10%; }
+    /*margin-top: 5%; */
+  }
   .section {
-    padding: 6rem 0; }
+    padding-top: 6rem; }
 }
 /* Larger than tablet */
 @media (min-width: 750px) {

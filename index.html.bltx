@@ -21,6 +21,7 @@
     <section class="header">
       <img class="prof-pic" src="http://www.rshah.org/public/prof-pic.jpg"></img>
       <h1 class="title fancy-font">Rushi Shah</h1>
+      <p>Java, Python, JavaScript, Ruby, and Haskell enthusiast.</p>
       <div class="row mobile-links">
         <div class="six columns value-prop">
           <h3 class="fancy-font"><a href="https://github.com/2016rshah">Github</a></h3>
@@ -48,6 +49,10 @@
     <div class="section intro">
       <ul id="blog-posts"></ul>
     </div>
+
+    <footer>
+      Powered by <a href="https://github.com/2016rshah/BlaTeX">BlaTeX.</a>
+    </footer>
 
 </body>
 </html>
