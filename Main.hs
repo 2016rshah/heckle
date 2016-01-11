@@ -47,7 +47,7 @@ data Post = Post {
     }
 
 instance Show Post where
-  show (Post fn t a d _) = t ++ " written by " ++ (a) ++ " on " ++ (d)
+  show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a) ++ " on " ++ (d)
 
 getPDF :: FilePath -> Maybe String
 getPDF xs = if splitUp !! 1 == "pdf" then Just (splitUp !! 0) else Nothing
@@ -79,7 +79,7 @@ createPost s (Right t) = Post <$> pure s <*> title <*> author <*> date <*> pure 
 fileNameToPost :: String -> IO (Maybe Post) 
 fileNameToPost fn = do
   latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
-  return (createPost "post1" latexFile)
+  return (createPost fn latexFile)
 
 injectPosts :: String -> Html -> String 
 injectPosts layout ul = renderTags (beginning ++ parseTags (show ul) ++ end)
@@ -95,14 +95,17 @@ main = do
       --get all pdf files from directory
       putStrLn "Getting directory contents"
       fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
+      print fileNames
 
       --turn the list of files into a list of posts
       putStrLn "Turning directory contents into posts"
       posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
+      print posts
 
       --generate a ul from the list of posts
       putStrLn "Turning posts into an HTML element"
       let generatedHtml = postsToHtml posts
+      print generatedHtml
 
       --read the layout file
       putStrLn "Reading the layout file"
