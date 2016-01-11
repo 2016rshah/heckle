@@ -97,17 +97,17 @@ main = do
       --get all pdf files from directory
       putStrLn "Getting directory contents"
       fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
-      print fileNames
+      --print fileNames
 
       --turn the list of files into a list of posts
       putStrLn "Turning directory contents into posts"
       posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
-      print posts
+      --print posts
 
       --generate a ul from the list of posts
       putStrLn "Turning posts into an HTML element"
       let generatedHtml = postsToHtml posts
-      print generatedHtml
+      --print generatedHtml
 
       --read the layout file
       putStrLn "Reading the layout file"

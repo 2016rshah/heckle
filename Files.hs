@@ -15,6 +15,5 @@ exampleTeXPost = unlines
 
 exampleBltxFile :: String
 exampleBltxFile = unlines
-                  [ "<ul id='blog-posts'>"
-                  , "</ul>"
+                  [ "<ul id='blog-posts'></ul>"
                   ]
