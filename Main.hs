@@ -10,21 +10,23 @@ import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.String
 
 --Stuff for HaTeX
-import Text.LaTeX
+import Text.LaTeX hiding (unlines)
 import Text.LaTeX.Base.Parser
 import Text.LaTeX.Base.Syntax
-import Data.Text (unlines, pack, unpack)
+import Data.Text (pack, unpack)
 import qualified Data.Text.IO as T
 
 --Stuff for TagSoup
 import Text.HTML.TagSoup
 
 --Other stuff I'm using
-import System.Directory (getDirectoryContents) 
+import System.Directory 
 import Data.List.Split
 import Data.Maybe
 import Control.Applicative
 import System.Environment (getArgs)
+import System.Process (readProcess)
+import Files
 
 instance Show Html where
   show = renderHtml
@@ -119,6 +121,16 @@ main = do
       putStrLn "Writing resulting file into index.html"
       writeFile "index.html" outputFile
 
-      putStrLn "Success!"
-    ["init"] -> print "Not implemented yet..."
+      putStrLn "Success building!"
+    ["init"] -> do
+      --Create the basic layout file
+      writeFile "index.html.bltx" exampleBltxFile --Change to layout when testing, index when deploying"
+      --Create directory for posts and basic post
+      createDirectoryIfMissing True "posts"
+      setCurrentDirectory "posts"
+      writeFile "example-post.tex" exampleTeXPost
+      --Compile the LaTeX file into a PDF
+      readProcess "pdflatex" ["example-post.tex"] ""
+      print "Success initializing!"
+      
     _ -> print "That's not a valid command"
