@@ -7,21 +7,30 @@ BlaTeX is basically Jekyll for LaTeX and thus a lot of the same benefits apply:
 
  >~~Jekyll~~ BlaTeX is a simple, blog-aware, static site generator. It takes a template directory containing ~~raw text files in various formats~~ LaTeX files, ~~runs it through a converter (like Markdown) and our Liquid renderer,~~ and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. ~~Jekyll also happens to be the engine behind GitHub Pages, which means~~ you can use ~~Jekyll~~ BlaTeX to host your project’s page, blog, or website from GitHub’s servers for free.
 
+#Requirements
+
+ - [The Haskell Platform](https://www.haskell.org/platform/)
+ - [LaTeX](https://latex-project.org/ftp.html)
+
 #How To
 
-Create a skeleton file structure like this, and you can just run blatex in the root directory and push to gh-pages for a blog.
+First install [BlaTeX](http://hackage.haskell.org/package/blatex-0.1.0.4) by running `cabal install blatex`. Then create the directory you want your blog to be based in, initialize a git repository, etc.
+
+When you're ready, from that directory run `blatex init`. That will create a skeleton file structure like this:
 
 ```bash
 .
 ├── index.html.bltx
 └── posts	
-    ├── post1.pdf
-    ├── post1.tex
-    ├── post2.pdf
-    └── post2.tex	
+    ├── example-post.pdf
+    └── example-post.tex	
 ```
 
-The `index.html.bltx` will basically be the layout you want for the homepage of your blog. Just make sure it is a valid HTML file (with Javascript, CSS, whatever you want) and include the following HTML element wherever you want the list of your blog posts to go:
+Now finally you can do `blatex build` to generate your site. If that succeeds, you will have the example blog up and running!
+
+#Customizing
+
+The `index.html.bltx` will basically be the layout you want for the homepage of your blog. Just make sure it is a valid HTML file (with Javascript, CSS, whatever you want) and make sure to keep the following HTML element wherever you want the list of your blog posts to go:
 
 ```html
 <ul id="blog-posts"></ul>
@@ -29,13 +38,11 @@ The `index.html.bltx` will basically be the layout you want for the homepage of 
 
 Each blog post will be an `li` element (with the class `blog-post`) containing an `a` tag to the post. The `a` tag will have the title of that blog post (which is specified in the LaTeX file as usual with `\title{WHATEVER THE TITLE IS}`).
 
-After you have your layout file (in `index.html.bltx`) and your posts (in the `posts` directory), you can just do
+If you want an example of a decent looking blog, rather than just the skeleton, you can use [this example `index.html.bltx` file](https://github.com/2016rshah/BlaTeX/blob/master/index.html.bltx). 
 
-```bash
-$ cabal install blatex
-$ blatex build
-$ git add .; git commit -m 'Started a blog!'; git push origin gh-pages
-```
+Obviously, your own blog would need its own posts too! I don't know how to help you with content, you'll need to figure that out yourself, but when you do you will be able to write your posts in the posts directory as LaTeX files. You will also need to compile them yourself (with `pdflatex` probably) just like you normally would and make sure the resulting PDFs look nice. When you're satisfied, you can run `blatex build` again to update the blog. 
+
+If you don't want to run `blatex build` every time you change a file, look into [SOS](https://github.com/schell/steeloverseer) or [Gulp](http://gulpjs.com/). 
 
 #Todo
  - ~~Templates for index page that I can insert HTML into~~
