@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css?family=Sorts+Mill+Goudy" rel="stylesheet" type="text/css">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css">
+  <link rel="stylesheet" href="skeleton.css">
   <link rel="stylesheet" href="index.css">
 
 </head>

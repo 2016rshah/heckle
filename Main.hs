@@ -7,7 +7,7 @@ import Control.Monad (forM_)
 
 import Text.Blaze.Html5 as H hiding (main, map)
 import Text.Blaze.Html5.Attributes as A
-import Text.Blaze.Html.Renderer.String
+import Text.Blaze.Html.Renderer.Pretty
 
 --Stuff for HaTeX
 import Text.LaTeX hiding (unlines)
@@ -122,6 +122,7 @@ main = do
       writeFile "index.html" outputFile
 
       putStrLn "Success building!"
+
     ["init"] -> do
       --Create the basic layout file
       writeFile "index.html.bltx" exampleBltxFile --Change to layout when testing, index when deploying"
