@@ -19,9 +19,13 @@ import qualified Data.Text.IO as T
 --Stuff for TagSoup
 import Text.HTML.TagSoup
 
+--Stuff for Dates
+import Data.Dates
+
 --Other stuff I'm using
 import System.Directory 
 import Data.List.Split
+import Data.List
 import Data.Maybe
 import Control.Applicative
 import System.Environment (getArgs)
@@ -44,12 +48,16 @@ data Post = Post {
   fileName :: String
   , postTitle :: String
   , postAuthor :: String
-  , postDate :: String
+  , postDate :: DateTime
   , syntaxTree :: LaTeX
     }
+    deriving (Eq)
+
+instance Ord Post where
+  compare (Post _ _ _ d1 _) (Post _ _ _ d2 _) = compare d1 d2
 
 instance Show Post where
-  show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a) ++ " on " ++ (d)
+  show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a)
 
 getPDF :: FilePath -> Maybe String
 getPDF xs = if splitUp !! 1 == "pdf" then Just (splitUp !! 0) else Nothing
@@ -70,25 +78,37 @@ extractFromArgs ((FixArg (TeXRaw s)):xs) = s
 getCommandValue :: String -> LaTeX -> Maybe Text
 getCommandValue s = (fmap extractFromArgs . extractCommandArgs s) 
 
-createPost :: String -> Either ParseError LaTeX -> Maybe Post
-createPost _ (Left err) = Nothing
-createPost s (Right t) = Post <$> pure s <*> title <*> author <*> date <*> pure t
+--Converts either to maybe (for use by maybe applicative)
+--eToM :: Either a a -> Maybe a
+--eToM e = case e of
+--   Left _ -> Nothing
+--   Right d -> (Just d)
+
+eToM :: Maybe (Either l r) -> Maybe r
+eToM Nothing = Nothing
+eToM (Just (Left _)) = Nothing
+eToM (Just (Right r)) = Just r
+
+createPost :: String -> Either ParseError LaTeX -> DateTime -> Maybe Post
+createPost _ (Left err) _ = Nothing
+createPost s (Right t)  time = Post <$> pure s <*> title <*> author <*> date <*> pure t
   where 
-    date = fmap unpack (getCommandValue "date" t)
+    date = eToM (fmap (parseDate time) (fmap unpack (getCommandValue "date" t)))
     author = fmap unpack (getCommandValue "author" t)
     title = fmap unpack (getCommandValue "title" t)
 
 fileNameToPost :: String -> IO (Maybe Post) 
 fileNameToPost fn = do
   latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
-  return (createPost fn latexFile)
+  t <- getCurrentDateTime
+  return (createPost fn latexFile t)
 
 injectPosts :: String -> Html -> String 
 injectPosts layout ul = renderTags (beginning ++ parseTags (show ul) ++ end)
   where
     splitFile = splitOn [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] (parseTags layout)
     beginning = splitFile !! 0
-    end = splitFile !! 1
+    end = splitFile !! 1 --safe indexing?
 
 main = do
   args <- getArgs
@@ -101,7 +121,7 @@ main = do
 
       --turn the list of files into a list of posts
       putStrLn "Turning directory contents into posts"
-      posts <- fmap (catMaybes) (mapM fileNameToPost fileNames)
+      posts <- fmap (reverse . sort . catMaybes) (mapM fileNameToPost fileNames)
       --print posts
 
       --generate a ul from the list of posts

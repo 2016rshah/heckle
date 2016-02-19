@@ -56,4 +56,4 @@ If you don't want to run `blatex build` every time you change a file, look into 
    - ~~Be able to create them from Haskell~~
  - Format the code before inserting it into the HTML
  - `blatex watch` - Constantly watch layout and posts directory to rebuild on change
- - Sort posts by the date provided in LaTeX file
+ - ~~Sort posts by the date provided in LaTeX file~~
