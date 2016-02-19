@@ -5,7 +5,7 @@ exampleTeXPost :: String
 exampleTeXPost = unlines
                  [ "\\documentclass{article}"
                  , "\\author{Rushi Shah}"
-                 , "\\date{January 2015}"
+                 , "\\date{1 January 2015}"
                  , "\\title{Example Post}"
                  , "\\begin{document}"
                  , "\\maketitle"
