@@ -54,6 +54,6 @@ If you don't want to run `blatex build` every time you change a file, look into 
    - ~~Create a basic template HTML file that's decently pretty, but basic~~
    - ~~Create a couple sample blog posts~~
    - ~~Be able to create them from Haskell~~
- - Format the code before inserting it into the HTML
+ - ~~Format the code before inserting it into the HTML~~
  - `blatex watch` - Constantly watch layout and posts directory to rebuild on change
  - ~~Sort posts by the date provided in LaTeX file~~
