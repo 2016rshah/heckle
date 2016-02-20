@@ -7,6 +7,8 @@ BlaTeX is basically Jekyll for LaTeX and thus a lot of the same benefits apply:
 
  >~~Jekyll~~ BlaTeX is a simple, blog-aware, static site generator. It takes a template directory containing ~~raw text files in various formats~~ LaTeX files, ~~runs it through a converter (like Markdown) and our Liquid renderer,~~ and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. ~~Jekyll also happens to be the engine behind GitHub Pages, which means~~ you can use ~~Jekyll~~ BlaTeX to host your project’s page, blog, or website from GitHub’s servers for free.
 
+Also, because I was such a big fan of [The Hyde Theme](https://github.com/poole/hyde), I ended up porting it for myself one night. If you have a Jekyll theme you're really attached to, it shouldn't be too difficult to do the same. 
+
 #Requirements
 
  - [The Haskell Platform](https://www.haskell.org/platform/)
