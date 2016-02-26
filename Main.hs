@@ -63,20 +63,21 @@ getPDF :: FilePath -> Maybe String
 getPDF xs = if splitUp !! 1 == "pdf" then Just (splitUp !! 0) else Nothing
   where splitUp = splitOn "." xs
 
-extractCommandArgs :: String -> LaTeX -> Maybe [TeXArg]
-extractCommandArgs s (TeXSeq lt rt) = if isJust lst then lst else rst
-  where lst = extractCommandArgs s lt
-        rst = extractCommandArgs s rt
-extractCommandArgs s (TeXComm name args)
-  | name == s = Just args
-  | otherwise = Nothing
-extractCommandArgs _ _ = Nothing
+--extractCommandArgs :: String -> LaTeX -> Maybe [TeXArg]
+--extractCommandArgs s (TeXSeq lt rt) = if isJust lst then lst else rst
+--  where lst = extractCommandArgs s lt
+--        rst = extractCommandArgs s rt
+--extractCommandArgs s (TeXComm name args)
+--  | name == s = Just args
+--  | otherwise = Nothing
+--extractCommandArgs _ _ = Nothing
 
-extractFromArgs :: [TeXArg] -> Text
-extractFromArgs ((FixArg (TeXRaw s)):xs) = s
+extractFromArgs :: [[TeXArg]] -> Maybe Text
+extractFromArgs (((FixArg (TeXRaw s)):_):_) = Just s
+extractFromArgs _ = Nothing
 
 getCommandValue :: String -> LaTeX -> Maybe Text
-getCommandValue s = (fmap extractFromArgs . extractCommandArgs s) 
+getCommandValue s = (extractFromArgs . lookForCommand s) 
 
 --Converts either to maybe (for use by maybe applicative)
 --eToM :: Either a a -> Maybe a
@@ -93,9 +94,9 @@ createPost :: String -> Either ParseError LaTeX -> DateTime -> Maybe Post
 createPost _ (Left err) _ = Nothing
 createPost s (Right t)  time = Post <$> pure s <*> title <*> author <*> date <*> pure t
   where 
-    date = eToM (fmap (parseDate time) (fmap unpack (getCommandValue "date" t)))
-    author = fmap unpack (getCommandValue "author" t)
-    title = fmap unpack (getCommandValue "title" t)
+    date = eToM (fmap (parseDate time) (unpack <$> (getCommandValue "date" t)))
+    author = unpack <$> (getCommandValue "author" t)
+    title = unpack <$> (getCommandValue "title" t)
 
 fileNameToPost :: String -> IO (Maybe Post) 
 fileNameToPost fn = do
