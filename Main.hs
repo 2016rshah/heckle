@@ -26,7 +26,7 @@ import Data.Dates
 import System.Directory 
 import Data.List.Split
 import Data.List
-import Data.Maybe
+import Data.Either
 import Control.Applicative
 import System.Environment (getArgs)
 import System.Process (readProcess)
@@ -59,21 +59,22 @@ instance Ord Post where
 instance Show Post where
   show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a)
 
-getPDF :: FilePath -> Maybe String
+getPDF :: FilePath -> Either String String
 getPDF xs = if length splitUp == 2 
             then 
               if splitUp !! 1 == "pdf" 
-              then Just (splitUp !! 0) 
-              else Nothing
-            else Nothing
+              then Right (splitUp !! 0) 
+              else Left "Not a pdf file"
+            else Left "Not a file (probably a folder)"
   where splitUp = splitOn "." xs
 
-extractFromArgs :: [[TeXArg]] -> Maybe Text
-extractFromArgs (((FixArg (TeXRaw s)):_):_) = Just s
-extractFromArgs _ = Nothing
+extractFromArgs :: String -> [[TeXArg]] -> Either String Text
+extractFromArgs _ (((FixArg (TeXRaw s)):_):_) = Right s
+extractFromArgs s [] = Left ("Command not found: " ++ s)
+extractFromArgs s _ = Left ("Could not parse arguments passed to " ++ s ++ " command")
 
-getCommandValue :: String -> LaTeX -> Maybe Text
-getCommandValue s = (extractFromArgs . lookForCommand s) 
+getCommandValue :: String -> LaTeX -> Either String Text
+getCommandValue s = (extractFromArgs s . lookForCommand s) 
 
 --Converts either to maybe (for use by maybe applicative)
 --eToM :: Either a a -> Maybe a
@@ -81,27 +82,29 @@ getCommandValue s = (extractFromArgs . lookForCommand s)
 --   Left _ -> Nothing
 --   Right d -> (Just d)
 
-eToM :: Maybe (Either l r) -> Maybe r
-eToM Nothing = Nothing
-eToM (Just (Left _)) = Nothing
-eToM (Just (Right r)) = Just r
+hackyTypeMagic :: Either String (Either b c) -> Either String c
+hackyTypeMagic (Left e) = Left e
+hackyTypeMagic (Right (Left _)) = Left "Could not parse date" 
+hackyTypeMagic (Right (Right r)) = Right r
 
-createPost :: String -> Either ParseError LaTeX -> DateTime -> Maybe Post
-createPost _ (Left err) _ = Nothing
+createPost :: String -> Either ParseError LaTeX -> DateTime -> Either String Post
+createPost _ (Left err) _ = Left (show err) --This is sketchy, I don't like just "show"ing the ParseError
 createPost s (Right t)  time = Post <$> pure s <*> title <*> author <*> date <*> pure t
   where 
-    date = eToM (fmap (parseDate time) (unpack <$> (getCommandValue "date" t)))
+    date = hackyTypeMagic (fmap (parseDate time) (unpack <$> (getCommandValue "date" t)))
     author = unpack <$> (getCommandValue "author" t)
     title = unpack <$> (getCommandValue "title" t)
 
-fileNameToPost :: String -> IO (Maybe Post) 
+fileNameToPost :: String -> IO (Either String Post) 
 fileNameToPost fn = do
   latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
   t <- getCurrentDateTime
   return (createPost fn latexFile t)
 
-injectPosts :: String -> Html -> String 
-injectPosts layout ul = renderTags (beginning ++ parseTags (show ul) ++ end)
+injectPosts :: String -> Html -> Either String String 
+injectPosts layout ul = if length splitFile == 2
+                        then Right (renderTags (beginning ++ parseTags (show ul) ++ end))
+                        else Left "Broken layout file"
   where
     splitFile = splitOn [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] (parseTags layout)
     beginning = splitFile !! 0
@@ -113,12 +116,20 @@ main = do
     ["build"] -> do
       --get all pdf files from directory
       putStrLn "Getting directory contents"
-      fileNames <- fmap (catMaybes . map getPDF) (getDirectoryContents "posts")
+      fileNamesAndBrokenFiles <- fmap (map getPDF) (getDirectoryContents "posts")
+      let fileNames = rights fileNamesAndBrokenFiles
+      let brokenFiles = lefts fileNamesAndBrokenFiles
+      --print brokenFiles
       --print fileNames
 
       --turn the list of files into a list of posts
       putStrLn "Turning directory contents into posts"
-      posts <- fmap (reverse . sort . catMaybes) (mapM fileNameToPost fileNames)
+      postsToBeCreated <- (mapM fileNameToPost fileNames)
+      let posts = (reverse . sort . rights) postsToBeCreated
+      let brokenPosts = lefts postsToBeCreated
+      if length (brokenPosts) > 1 
+        then print brokenPosts
+        else putStrLn "All posts are well formed"
       --print posts
 
       --generate a ul from the list of posts
@@ -132,13 +143,15 @@ main = do
 
       --put the ul into the layout file
       putStrLn "Inserting HTML element into layout file"
-      let outputFile = layoutFile `injectPosts` generatedHtml
+      let injectedOutput = layoutFile `injectPosts` generatedHtml
+      case injectedOutput of
+        (Left e) -> putStrLn e
+        (Right s) -> do
+          --put the results into the index.html file
+          putStrLn "Writing resulting file into index.html"
+          writeFile "index.html" s
+          putStrLn "Success building!"
 
-      --put the results into the index.html file
-      putStrLn "Writing resulting file into index.html"
-      writeFile "index.html" outputFile
-
-      putStrLn "Success building!"
 
     ["init"] -> do
       --Create the basic layout file
