@@ -60,17 +60,13 @@ instance Show Post where
   show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a)
 
 getPDF :: FilePath -> Maybe String
-getPDF xs = if splitUp !! 1 == "pdf" then Just (splitUp !! 0) else Nothing
+getPDF xs = if length splitUp == 2 
+            then 
+              if splitUp !! 1 == "pdf" 
+              then Just (splitUp !! 0) 
+              else Nothing
+            else Nothing
   where splitUp = splitOn "." xs
-
---extractCommandArgs :: String -> LaTeX -> Maybe [TeXArg]
---extractCommandArgs s (TeXSeq lt rt) = if isJust lst then lst else rst
---  where lst = extractCommandArgs s lt
---        rst = extractCommandArgs s rt
---extractCommandArgs s (TeXComm name args)
---  | name == s = Just args
---  | otherwise = Nothing
---extractCommandArgs _ _ = Nothing
 
 extractFromArgs :: [[TeXArg]] -> Maybe Text
 extractFromArgs (((FixArg (TeXRaw s)):_):_) = Just s
