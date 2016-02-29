@@ -28,7 +28,6 @@ import Data.Dates
 import Data.List.Split
 import Data.Either
 import Control.Applicative
-import Files
 
 instance Show Html where
   show = renderHtml
