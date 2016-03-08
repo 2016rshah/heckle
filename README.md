@@ -40,7 +40,7 @@ The `index.html.bltx` will basically be the layout you want for the homepage of 
 
 Each blog post will be an `li` element (with the class `blog-post`) containing an `a` tag to the post. The `a` tag will have the title of that blog post (which is specified in the LaTeX file as usual with `\title{WHATEVER THE TITLE IS}`).
 
-If you want an example of a decent looking blog, rather than just the skeleton, you can use [this example `index.html.bltx` file](https://github.com/2016rshah/thoughts/blob/gh-pages/index.html.bltx). You could also just follow the instructions given in [the README](https://github.com/2016rshah/thoughts/). 
+If you want an example of a decent looking blog, rather than just the skeleton, you can use [this example `index.html.bltx` file](https://github.com/2016rshah/blog/blob/gh-pages/index.html.bltx). You could also just follow the instructions given in [the README](https://github.com/2016rshah/blog/). 
 
 Obviously, your own blog would need its own posts too! I don't know how to help you with content, you'll need to figure that out yourself, but when you do you will be able to write your posts in the posts directory as LaTeX files. You will also need to compile them yourself (with `pdflatex` probably) just like you normally would and make sure the resulting PDFs look nice. You need to ensure that you include a `\title` and a `\date`. Make sure you format the date as `\date{1 January 2016}` otherwise BlaTeX won't find your post! When you're satisfied, you can run `blatex build` again to update the blog. 
 
