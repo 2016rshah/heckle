@@ -38,7 +38,18 @@ The `index.html.bltx` will basically be the layout you want for the homepage of 
 <ul id="blog-posts"></ul>
 ```
 
-Each blog post will be an `li` element (with the class `blog-post`) containing an `a` tag to the post. The `a` tag will have the title of that blog post (which is specified in the LaTeX file as usual with `\title{WHATEVER THE TITLE IS}`).
+Each blog post will be an `li` element (with the class `blog-post`) containing an `a` tag to the post and a `div` with the date. The `a` tag will have the title of that blog post (which is specified in the LaTeX file as usual with `\title{WHATEVER THE TITLE IS}`) and the class of `post-link`. The `div` tag will have the date of that blog post (specified in the LaTeX file with `\date{WHATEVER THE DATE IS}`) and the class of `post-date`. This is an example:
+
+```html
+<li class="blog-post">
+    <a class="post-link" href="posts/example-post.pdf">
+        Example Post
+    </a>
+    <div class="post-date">
+        1 January 2015
+    </div>
+</li>
+```
 
 If you want an example of a decent looking blog, rather than just the skeleton, you can use [this example `index.html.bltx` file](https://github.com/2016rshah/blog/blob/gh-pages/index.html.bltx). You could also just follow the instructions given in [the README](https://github.com/2016rshah/blog/). 
 
@@ -59,4 +70,4 @@ If you don't want to run `blatex build` every time you change a file, look into 
  - ~~Format the code before inserting it into the HTML~~
  - `blatex watch` - Constantly watch layout and posts directory to rebuild on change
  - ~~Sort posts by the date provided in LaTeX file~~
- - Add dates to each li element
+ - ~~Add dates to each li element~~

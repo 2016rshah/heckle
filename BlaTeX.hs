@@ -23,6 +23,7 @@ import Text.HTML.TagSoup
 
 --Stuff for Dates
 import Data.Dates
+import Data.Char (toUpper)
 
 --Other stuff I'm using
 import Data.List.Split
@@ -32,14 +33,43 @@ import Control.Applicative
 instance Show Html where
   show = renderHtml
 
+--Post {fileName = "example-post", postTitle = "Example Post", postAuthor = "Rushi Shah", postDate = 1 January 2015, 0:0:0, syntaxTree = TeXSeq (TeXComm "documentclass" [FixArg (TeXRaw "article")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "author" [FixArg (TeXRaw "Rushi Shah")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "date" [FixArg (TeXRaw "1 January 2015")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "title" [FixArg (TeXRaw "Example Post")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXEnv "document" [] (TeXSeq (TeXRaw "\n") (TeXSeq (TeXCommS "maketitle") (TeXRaw "\nThis is an example LaTeX/PDF post.\n")))) (TeXRaw "\n")))))))))}
+
+-- | 12 months names.
+months :: [String]
+months = ["january",
+          "february",
+          "march",
+          "april",
+          "may",
+          "june",
+          "july",
+          "august",
+          "september",
+          "october",
+          "november",
+          "december"]
+
+-- | capitalize first letter of the string
+capitalize :: String -> String
+capitalize [] = []
+capitalize (x:xs) = (toUpper x):xs
+
+-- | Show name of given month
+showMonth ::  Int -> String
+showMonth i = capitalize $ months !! (i-1)
+
+displayDate :: DateTime -> String
+displayDate (DateTime y m d h mins s) = show d ++ " " ++ showMonth m ++ " " ++ show y
+
 postsToHtml :: [Post] -> Html
 postsToHtml xs = do
   ul ! A.id "blog-posts" $
     forM_ xs h
   where
-    h s = li ! class_ "blog-post" $
-          a ! href (stringValue ("posts/"++fileName s++".pdf")) $
-          toHtml (postTitle s)
+    h s = li ! class_ "blog-post" $ do
+            a ! class_ "post-link" ! href (stringValue ("posts/"++fileName s++".pdf")) $ toHtml (postTitle s)
+            H.div ! class_ "post-date" $ toHtml ((displayDate . postDate) s)
           
 data Post = Post {
   fileName :: String
@@ -48,13 +78,13 @@ data Post = Post {
   , postDate :: DateTime
   , syntaxTree :: LaTeX
     }
-    deriving (Eq)
+    deriving (Eq, Show)
 
 instance Ord Post where
   compare (Post _ _ _ d1 _) (Post _ _ _ d2 _) = compare d1 d2
 
-instance Show Post where
-  show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a)
+--instance Show Post where
+--  show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a)
 
 getPDF :: FilePath -> Either String String
 getPDF xs = if length splitUp == 2 
