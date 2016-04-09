@@ -23,7 +23,6 @@ import Text.HTML.TagSoup
 
 --Stuff for Dates
 import Data.Dates
-import Data.Char (toUpper)
 
 --Other stuff I'm using
 import Data.List.Split
@@ -37,27 +36,11 @@ instance Show Html where
 
 -- | 12 months names.
 months :: [String]
-months = ["january",
-          "february",
-          "march",
-          "april",
-          "may",
-          "june",
-          "july",
-          "august",
-          "september",
-          "october",
-          "november",
-          "december"]
-
--- | capitalize first letter of the string
-capitalize :: String -> String
-capitalize [] = []
-capitalize (x:xs) = (toUpper x):xs
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 -- | Show name of given month
 showMonth ::  Int -> String
-showMonth i = capitalize $ months !! (i-1)
+showMonth i = months !! (i-1)
 
 displayDate :: DateTime -> String
 displayDate (DateTime y m d h mins s) = show d ++ " " ++ showMonth m ++ " " ++ show y
