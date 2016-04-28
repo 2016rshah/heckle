@@ -1,12 +1,16 @@
 \documentclass[jou,apacite]{apa6}
 
+%-------------------------
+ % Packages
 
+\usepackage[normalem]{ulem}
+\usepackage{listings}
 
 %-------------------------
  % The Title of your paper
 
 \title{BlaTeX}
-\shorttitle{kosek8}
+\shorttitle{shah16}
 
 %-------------------------
  % Author
@@ -14,11 +18,10 @@
 \author{Rushi Shah}
 \affiliation{TJHSST}
 
-
 %-------------------------
  % Abstract               
 %-------------------------
-\abstract{This is the abstract. This does not need to be on its own page if you are using this template.}
+\abstract{Write your blog in LaTeX}
 
 \begin{document}
 \maketitle    
@@ -27,17 +30,18 @@
  % Introduction               
 %-------------------------
 \section{Introduction}
-Motivation for research.
-Sample text.Sample text. Sample text. Sample text. Sample text. Sample text. 
-Sample text. Sample text. Citation of Einstein paper~\cite{Einstein}. Citation of Freud book~\cite{Freud}.
+%Motivation for research.
+
+Markdown and HTML are the standard tools used to write your every day tech blog with. But they have pretty weak support for embedding mathematical formulas, and are not conducive to writing for an extended period of time. Plus, they aren't even Turing complete! So instead of writing posts in Markdown, my project allows writers to create posts in LaTeX instead and generate a static-site that can be deployed to any hosting service (like TJ's servers).
 
 %-------------------------
  % Background 
 %-------------------------
 \section{Background}
-Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
-Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
 
+Typically, static-sites like blogs are built with a tool called Jekyll. This Ruby project compiles Markdown posts into a static HTML site. BlaTeX is similar, it is a static-site compiler written in Haskell that compiles LaTeX posts into a deploy-able site. The following description has been edited to highlight the minor differences between Jekyll and BlaTeX:
+
+\sout{Jekyll} BlaTeX is a simple, blog-aware, static site generator. It takes a template directory containing \sout{raw text files in various formats} LaTeX files\sout{, runs it through a converter (like Markdown) and our Liquid renderer,} and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. \sout{Jekyll also happens to be the engine behind GitHub Pages, which means} you can use \sout{Jekyll} BlaTeX to host your project's page, blog, or website from GitHub's servers for free.
 
 %-------------------------
  % Development               
@@ -45,12 +49,12 @@ Sample text. Sample text. Sample text. Sample text. Sample text. Sample text.
 \section{Development}
 
 \subsubsection{Requirements}
-Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
-Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
 
-\subsubsection{Overview}
-Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
-Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
+This command line utility requires the Haskell Platform and LaTeX. The Haskell Platform includes GHC (a Haskell compiler) and Cabal, which is Haskell's primary package manager. LaTeX is needed to build LaTeX posts into their resulting PDFs. After the Haskell Platform has been installed, installing BlaTeX is simple:
+
+\begin{lstlisting}
+> cabal install blatex
+\end{lstlisting}
 
 \subsubsection{Overview}
 Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
@@ -58,8 +62,12 @@ Sample text. Sample text. Sample text. Sample text. Sample text. Sample text.
 
 
 \subsubsection{Limitations}
-Sample text. Sample text. Sample text. Sample text. Sample text. Sample text. 
 
+PDFs only
+
+HaTeX parsing issue
+
+Citation of Einstein paper~\cite{Einstein}. Citation of Freud book~\cite{Freud}.
 
 \bibliography{final}
 
