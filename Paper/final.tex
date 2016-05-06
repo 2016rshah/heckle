@@ -12,6 +12,10 @@
 \usepackage{graphicx}
 \graphicspath{ {resources/} }
 
+\usepackage{minted}
+
+\usepackage{wrapfig}
+
 %-------------------------
  % Commands
 \newcommand{\bx}{BlaTeX }
@@ -77,7 +81,7 @@ This command line utility requires the Haskell Platform and LaTeX. The Haskell P
 
 \subsubsection{Overview}
 % Briefly outline the method used to develop the project
-The project is a command line utility that is written in Haskell. 
+The project is a command line utility that is written in Haskell. Haskell is a statically-typed functional programming language that makes heavy use of the REPL. Libraries were tested/experimented with independently in their own files. After the necessary functions were written, they were integrated into the final product. The finished project was assembled into an executable file and deployed to Haskell's package manager (Hackage). 
 
 \subsubsection{Limitations}
 % Equipment, time, materials, etc.
@@ -95,22 +99,75 @@ Dates are formatted in \texttt{DD MONTH YEAR} which contributes to the minimalis
 \subsection{Developmental Procedures}
 % Explain the steps you took such that your project could be repeated by others (how you did it)
 
+In general terms: a directory containing posts is examined by BlaTeX, each post is parsed into an abstract syntax tree, information from this tree is parsed into a Haskell Post object, each object is converted into it's corresponding HTML, and this HTML is outputted into an output file at the correct location. 
+
+\subsubsection{The \texttt{Post} Algebraic Data Strucure}
+
+Haskell doesn't have ``objects'' per-se, but rather it has ``algebraic data types''. They are kind of similar, so for the purposes of this paper you can consider them equivalent. The final definition for the Post was:
+
+\begin{minted}{haskell}
+data Post = Post {
+  fileName :: String
+  , postTitle :: String
+  , postAuthor :: String
+  , postDate :: DateTime
+  , syntaxTree :: LaTeX
+    }
+    deriving (Eq, Show)
+\end{minted}
+
+This basically defines the structure of a Post based on each attribute it would have and what type that attribute would have. 
+
+\subsubsection{BlazeHTML}
+The first part of the project that I tacked was generating HTML elements that would need to be inserted into the final file. Each post object would generate the following LI element:
+
+\begin{minted}{html}
+<li class='blog-post'>
+    <a class='post-link' href='posts/example-post.pdf'>
+        Example Post
+    </a>
+    <div class='post-date'>
+        1 January 2015
+    </div>
+</li>
+\end{minted}
+
+\subsubsection{HaTeX}
+The second part of the project required that I read in LaTeX files for the posts and use them to extract certain meta-information about each post. This included the title of the post (inserted into the \texttt{.post-link} tag) and the date of the post (used to sort posts and displayed in the \texttt{.post-date} tag). 
+
+\subsubsection{TagSoup}
+
+The user supplies a layout file which defines the format and style of their blog. BlaTeX finds the line \texttt{<ul id='blog-posts'></ul>} and inserts all the posts at that point. In order to do so, the project reads in an HTML file and derives it's abstract syntax tree with a package called TagSoup. TagSoup converts an HTML file into a list of HTML elements, and the HTML generated with BlazeHTML is inserted at the specified point. 
+
+\subsubsection{Dates}
+
+Support for dates was one of the final undertakings addressed. The Data.Dates package was used to parse the LaTeX dates. This allowed me to sort the list of posts chronologically.  
+
+% \pagebreak 
 
 \subsection{Internal Testing and Analysis}
 % How did you test and validate your code?
 This tool was written in Haskell, a statically-typed, functional, compiled programming language. The compiled nature filtered out most insidious bugs in the code. Haskell development is also strongly integrated with using a Haskell REPL. Thus, each function was experimented with in the REPL after being written and before being pushed to production. 
 
+% \pagebreak
+
 \subsection{User Interface Testing and Analysis}
 % Explain your user validation test
 % Present the results of your user validation test
 % I literally used it to maintain my own blog
+
+\begin{wrapfigure}{r}{0.6\textwidth}
+  % \begin{center}
+    \includegraphics[width=0.6\textwidth]{facebook}
+  % \end{center}
+  \centering
+\end{wrapfigure}
+
 In order to test this project, I used it to create and maintain \url{http://rshah.org/blog}. Through my own use I discovered multiple improvements that could be made to the user interface and experience, which I promptly implemented. 
 
 I also posted my project in a Facebook group for functional programming and recieved an overwhelmingly positive response: 
-\begin{figure}[ht]
-	\includegraphics[width=\textwidth]{facebook}
-	\centering
-\end{figure}
+
+% \centerline{\includegraphics[width=.8\textwidth]{facebook}}
 
 It is also an open source project on Github, and met a similarly positive reaction from that community (with 17 Github ``stars''). 
 
@@ -119,10 +176,7 @@ It is also an open source project on Github, and met a similarly positive reacti
 
 My blog at \url{http://rshah.org/blog} is a visual representation of a static site compiled with BlaTeX.
 
-\begin{figure}[h]
-	\includegraphics[width=\textwidth]{BlaTeX_screenshot}
-	\centering
-\end{figure}
+\centerline{\includegraphics[width=.8\textwidth]{BlaTeX_screenshot}}
 
 %-------------------------
  % Results, Discussion, Conclusion              
