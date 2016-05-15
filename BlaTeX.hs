@@ -107,7 +107,7 @@ createPost s (Right t)  time = Post <$> pure s <*> title <*> author <*> date <*>
 
 fileNameToPost :: String -> IO (Either String Post) 
 fileNameToPost fn = do
-  latexFile <- fmap (parseLaTeX . pack) (readFile ("posts/"++fn++".tex"))
+  latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
   t <- getCurrentDateTime
   return (createPost fn latexFile t)
 
