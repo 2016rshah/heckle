@@ -23,7 +23,7 @@ executable blatex
   main-is:             Main.hs
   -- other-modules:       
   other-extensions:    OverloadedStrings
-  build-depends:       HaTeX >=3.16 && <3.17
+  build-depends:       HaTeX >=3.17 && <3.18
                      , base >=4.7 && <4.8
                      , blaze-html >= 0.8.1.1
                      , directory >=1.2 && <1.3
