@@ -28,6 +28,7 @@ import Data.Dates
 import Data.List.Split
 import Data.Either
 import Control.Applicative
+import Control.Monad (join)
 
 instance Show Html where
   show = renderHtml
@@ -83,33 +84,37 @@ extractFromArgs _ (((FixArg (TeXRaw s)):_):_) = Right s
 extractFromArgs s [] = Left ("Command not found: " ++ s)
 extractFromArgs s _ = Left ("Could not parse arguments passed to " ++ s ++ " command")
 
-getCommandValue :: String -> LaTeX -> Either String Text
-getCommandValue s = (extractFromArgs s . lookForCommand s) 
+getCommandValue :: String -> LaTeX -> Either String String
+getCommandValue s = (fmap unpack . extractFromArgs s . lookForCommand s) 
 
---Converts either to maybe (for use by maybe applicative)
---eToM :: Either a a -> Maybe a
---eToM e = case e of
---   Left _ -> Nothing
---   Right d -> (Just d)
+{-
+Relative dates aren't supported by BlaTeX
+(it makes no sense for a post to always be written "yesterday", a specific date should be given)
+However parsing the date requires the current datetime to be given to parse relative dates
+Originally I went through the IO hurdles of getting current datetime
+But that introduced unnecessary sideeffects
+So this is just a cleaner function to parse absolute dates
+(It will give nonsensical results for relative dates: use carefully!)
+I also wanted to stick with strings for error messages, so this just shows the ParseErrors from parseDate
+-}
+parseAbsoluteDate :: String -> Either String DateTime
+parseAbsoluteDate s = case parseDate fakeNow s of
+ (Left e) -> Left (show e)
+ (Right res) -> (Right res)
+ where fakeNow = DateTime 0 0 0 0 0 0
 
-hackyTypeMagic :: Either String (Either b c) -> Either String c
-hackyTypeMagic (Left e) = Left e
-hackyTypeMagic (Right (Left _)) = Left "Could not parse date" 
-hackyTypeMagic (Right (Right r)) = Right r
-
-createPost :: String -> Either ParseError LaTeX -> DateTime -> Either String Post
-createPost _ (Left err) _ = Left (show err) --This is sketchy, I don't like just "show"ing the ParseError
-createPost s (Right t)  time = Post <$> pure s <*> title <*> author <*> date <*> pure t
+createPost :: String -> Either ParseError LaTeX -> Either String Post
+createPost _ (Left err) = Left (show err) -- Just `show` a ParseError to stick with Strings as error messages
+createPost s (Right t) = Post <$> pure s <*> title <*> author <*> date <*> pure t
   where 
-    date = hackyTypeMagic (fmap (parseDate time) (unpack <$> (getCommandValue "date" t)))
-    author = unpack <$> (getCommandValue "author" t)
-    title = unpack <$> (getCommandValue "title" t)
+    date = (getCommandValue "date" t) >>= parseAbsoluteDate -- Either monad
+    author = getCommandValue "author" t
+    title = getCommandValue "title" t
 
 fileNameToPost :: String -> IO (Either String Post) 
 fileNameToPost fn = do
   latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
-  t <- getCurrentDateTime
-  return (createPost fn latexFile t)
+  return (createPost fn latexFile)
 
 injectPosts :: String -> Html -> Either String String 
 injectPosts layout ul = if length splitFile == 2
@@ -118,4 +123,5 @@ injectPosts layout ul = if length splitFile == 2
   where
     splitFile = splitOn [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] (parseTags layout)
     beginning = splitFile !! 0
-    end = splitFile !! 1 --safe indexing?
+    end = splitFile !! 1 --safe indexing? Or do I not need it because 
+    --This will lazy evauluate only if the length == 2 and so the error will never be reached
