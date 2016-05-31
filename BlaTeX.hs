@@ -28,20 +28,16 @@ import Data.Dates
 import Data.List.Split
 import Data.Either
 import Control.Applicative
-import Control.Monad (join)
 
 instance Show Html where
   show = renderHtml
 
 --Post {fileName = "example-post", postTitle = "Example Post", postAuthor = "Rushi Shah", postDate = 1 January 2015, 0:0:0, syntaxTree = TeXSeq (TeXComm "documentclass" [FixArg (TeXRaw "article")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "author" [FixArg (TeXRaw "Rushi Shah")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "date" [FixArg (TeXRaw "1 January 2015")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "title" [FixArg (TeXRaw "Example Post")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXEnv "document" [] (TeXSeq (TeXRaw "\n") (TeXSeq (TeXCommS "maketitle") (TeXRaw "\nThis is an example LaTeX/PDF post.\n")))) (TeXRaw "\n")))))))))}
 
--- | 12 months names.
-months :: [String]
-months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
 -- | Show name of given month
 showMonth ::  Int -> String
 showMonth i = months !! (i-1)
+              where months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 displayDate :: DateTime -> String
 displayDate (DateTime y m d h mins s) = show d ++ " " ++ showMonth m ++ " " ++ show y
@@ -67,17 +63,10 @@ data Post = Post {
 instance Ord Post where
   compare (Post _ _ _ d1 _) (Post _ _ _ d2 _) = compare d1 d2
 
---instance Show Post where
---  show (Post fn t a d _) = fn ++ " is a post called " ++ t ++ " written by " ++ (a)
-
 getPDF :: FilePath -> Either String String
-getPDF xs = if length splitUp == 2 
-            then 
-              if splitUp !! 1 == "pdf" 
-              then Right (splitUp !! 0) 
-              else Left "Not a pdf file"
-            else Left "Not a file (probably a folder)"
-  where splitUp = splitOn "." xs
+getPDF s = case splitOn "." s of
+             [fn, "pdf"] -> Right fn 
+             _ -> Left "Not a PDF file"
 
 extractFromArgs :: String -> [[TeXArg]] -> Either String Text
 extractFromArgs _ (((FixArg (TeXRaw s)):_):_) = Right s
@@ -117,11 +106,8 @@ fileNameToPost fn = do
   return (createPost fn latexFile)
 
 injectPosts :: String -> Html -> Either String String 
-injectPosts layout ul = if length splitFile == 2
-                        then Right (renderTags (beginning ++ parseTags (show ul) ++ end))
-                        else Left "Broken layout file"
+injectPosts layout ul = case splitFile of
+                        [beginning, end] -> Right (renderTags (beginning ++ parseTags (show ul) ++ end))
+                        _ ->  Left "Broken layout file"
   where
     splitFile = splitOn [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] (parseTags layout)
-    beginning = splitFile !! 0
-    end = splitFile !! 1 --safe indexing? Or do I not need it because 
-    --This will lazy evauluate only if the length == 2 and so the error will never be reached
