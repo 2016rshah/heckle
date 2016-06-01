@@ -59,7 +59,7 @@ If you don't want to run `blatex build` every time you change a file, look into 
 
 #Todo
  - ~~Templates for index page that I can insert HTML into~~
- - Modularize code to separate different tasks (extracting info from LaTeX files, creating HTML elements, inserting HTML into layout, etc.)
+ - ~~Modularize code to separate different tasks (extracting info from LaTeX files, creating HTML elements, inserting HTML into layout, etc.)~~
  - ~~Insert the generated HTML into the layout file~~
  - ~~Push to hackage~~
  - ~~Add command line options~~
@@ -71,3 +71,10 @@ If you don't want to run `blatex build` every time you change a file, look into 
  - `blatex watch` - Constantly watch layout and posts directory to rebuild on change
  - ~~Sort posts by the date provided in LaTeX file~~
  - ~~Add dates to each li element~~
+
+#See also:
+  - The Hackage package: https://hackage.haskell.org/package/blatex
+  - PDFs are the future ?¿?: http://www.rshah.org/blog/posts/what-is-the-web.pdf
+  - The Abstraction Progression of BlaTeX: http://www.rshah.org/blog/posts/abstraction-progression-blatex.pdf
+  - The culmination of BlaTeX in my final paper: https://github.com/2016rshah/Meta-BlaTeX/blob/master/Paper/final.pdf
+  - My powerpoint presentations about Haskell/BlaTeX: https://github.com/2016rshah/Meta-BlaTeX/tree/master/Presentations
