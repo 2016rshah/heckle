@@ -78,3 +78,4 @@ If you don't want to run `blatex build` every time you change a file, look into 
   - The Abstraction Progression of BlaTeX: http://www.rshah.org/blog/posts/abstraction-progression-blatex.pdf
   - The culmination of BlaTeX in my final paper: https://github.com/2016rshah/Meta-BlaTeX/blob/master/Paper/final.pdf
   - My powerpoint presentations about Haskell/BlaTeX: https://github.com/2016rshah/Meta-BlaTeX/tree/master/Presentations
+  - My poster for BlaTeX: https://github.com/2016rshah/Meta-BlaTeX/blob/master/Poster/Poster.pdf
