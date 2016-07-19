@@ -24,17 +24,25 @@ import Text.HTML.TagSoup
 --Stuff for Dates
 import Data.Dates
 
+--Pandoc
+import Text.Pandoc.Options
+import Text.Pandoc.Readers.Markdown
+import Text.Pandoc.Definition
+import Text.Pandoc.Writers.HTML
+import Text.Pandoc.Shared
+
 --Other stuff I'm using
 import Data.List.Split
 import Data.Either
 import Control.Applicative
+import Data.Map.Lazy as Map (lookup)
+import Control.Monad
 
 instance Show Html where
   show = renderHtml
 
 --Post {fileName = "example-post", postTitle = "Example Post", postAuthor = "Rushi Shah", postDate = 1 January 2015, 0:0:0, syntaxTree = TeXSeq (TeXComm "documentclass" [FixArg (TeXRaw "article")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "author" [FixArg (TeXRaw "Rushi Shah")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "date" [FixArg (TeXRaw "1 January 2015")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "title" [FixArg (TeXRaw "Example Post")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXEnv "document" [] (TeXSeq (TeXRaw "\n") (TeXSeq (TeXCommS "maketitle") (TeXRaw "\nThis is an example LaTeX/PDF post.\n")))) (TeXRaw "\n")))))))))}
 
--- | Show name of given month
 showMonth ::  Int -> String
 showMonth i = months !! (i-1)
               where months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -45,28 +53,44 @@ displayDate (DateTime y m d h mins s) = show d ++ " " ++ showMonth m ++ " " ++ s
 postsToHtml :: [Post] -> Html
 postsToHtml xs = do
   ul ! A.id "blog-posts" $
-    forM_ xs h
-  where
-    h s = li ! class_ "blog-post" $ do
-            a ! class_ "post-link" ! href (stringValue ("posts/"++fileName s++".pdf")) $ toHtml (postTitle s)
-            H.div ! class_ "post-date" $ toHtml ((displayDate . postDate) s)
-          
-data Post = Post {
+    forM_ xs postToHtml
+
+--DRY
+postToHtml :: Post -> Html
+postToHtml p@(MD _ _ _ _) = li ! class_ "blog-post" $ do
+        a ! class_ "post-link" ! href (stringValue ("posts/"++fileName p++".html")) $ toHtml (postTitle p)
+        H.div ! class_ "post-date" $ toHtml ((displayDate . postDate) p)
+postToHtml p@(LaTeX _ _ _ _) = li ! class_ "blog-post" $ do
+        a ! class_ "post-link" ! href (stringValue ("posts/"++fileName p++".pdf")) $ toHtml (postTitle p)
+        H.div ! class_ "post-date" $ toHtml ((displayDate . postDate) p)
+        
+data Post 
+  = LaTeX {
   fileName :: String
   , postTitle :: String
-  , postAuthor :: String
   , postDate :: DateTime
   , syntaxTree :: LaTeX
+    }
+  | MD {
+  fileName :: String
+  , postTitle :: String
+  , postDate :: DateTime
+  , pd :: Pandoc
     }
     deriving (Eq, Show)
 
 instance Ord Post where
-  compare (Post _ _ _ d1 _) (Post _ _ _ d2 _) = compare d1 d2
+  compare p1 p2 = compare (postDate p1) (postDate p2)
 
 getPDF :: FilePath -> Either String String
 getPDF s = case splitOn "." s of
              [fn, "pdf"] -> Right fn 
              _ -> Left "Not a PDF file"
+
+getMD :: FilePath -> Either String String
+getMD s = case splitOn "." s of
+            [fn, "md"] -> Right fn
+            _ -> Left "Not a PDF file"
 
 extractFromArgs :: String -> [[TeXArg]] -> Either String Text
 extractFromArgs _ (((FixArg (TeXRaw s)):_):_) = Right s
@@ -92,18 +116,36 @@ parseAbsoluteDate s = case parseDate fakeNow s of
  (Right res) -> (Right res)
  where fakeNow = DateTime 0 0 0 0 0 0
 
-createPost :: String -> Either ParseError LaTeX -> Either String Post
-createPost _ (Left err) = Left (show err) -- Just `show` a ParseError to stick with Strings as error messages
-createPost s (Right t) = Post <$> pure s <*> title <*> author <*> date <*> pure t
+getMeta :: (Meta -> [Inline]) -> Pandoc -> Either String String
+getMeta f (Pandoc m _) = case f m of
+  [] -> Left "Couldn't find it"
+  (xs) -> Right (stringify xs)
+
+createMDPost :: Show a => String -> Either a Pandoc -> Either String Post
+createMDPost _ (Left e) = Left (show e)
+createMDPost fn (Right pd) = 
+  MD <$> pure fn <*> title <*> date <*> pure pd
+  where
+    date = (getMeta docDate pd) >>= parseAbsoluteDate
+    title = getMeta docTitle pd
+--Make more DRY
+createLaTeXPost :: String -> Either ParseError LaTeX -> Either String Post
+createLaTeXPost _ (Left err) = Left (show err) -- Just `show` a ParseError to stick with Strings as error messages
+createLaTeXPost s (Right t) = 
+  LaTeX <$> pure s <*> title <*> date <*> pure t
   where 
     date = (getCommandValue "date" t) >>= parseAbsoluteDate -- Either monad
-    author = getCommandValue "author" t
     title = getCommandValue "title" t
 
-fileNameToPost :: String -> IO (Either String Post) 
-fileNameToPost fn = do
+mdToPost :: String -> IO (Either String Post)
+mdToPost fn = do
+  native <- fmap (readMarkdown def) (readFile ("posts/" ++ fn ++ ".md"))
+  return (createMDPost fn native)
+
+latexToPost :: String -> IO (Either String Post) 
+latexToPost fn = do
   latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
-  return (createPost fn latexFile)
+  return (createLaTeXPost fn latexFile)
 
 injectPosts :: String -> Html -> Either String String 
 injectPosts layout ul = case splitFile of
@@ -111,3 +153,9 @@ injectPosts layout ul = case splitFile of
                         _ ->  Left "Broken layout file"
   where
     splitFile = splitOn [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] (parseTags layout)
+
+writeHTML :: Post -> IO ()
+writeHTML (MD fn _ _ t) = do
+  let html = writeHtmlString def t
+  writeFile ("posts/" ++ fn ++ ".html") html 
+writeHTML (LaTeX _ _ _ _) = return ()
