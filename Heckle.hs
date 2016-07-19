@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module BlaTeX where
+module Heckle where
 
 --Stuff for BlazeHTML
 import Control.Monad (forM_)

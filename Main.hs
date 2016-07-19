@@ -4,7 +4,7 @@ import Data.List
 import System.Environment (getArgs)
 import System.Process (readProcess)
 import Files
-import BlaTeX
+import Heckle
 
 main = do
   args <- getArgs
@@ -40,7 +40,7 @@ main = do
 
       --read the layout file
       putStrLn "Reading the layout file"
-      layoutFile <- readFile "index.html.bltx"
+      layoutFile <- readFile "index.html.hkl"
 
       --put the ul into the layout file
       putStrLn "Inserting HTML element into layout file"
@@ -56,7 +56,7 @@ main = do
 
     ["init"] -> do
       --Create the basic layout file
-      writeFile "index.html.bltx" exampleBltxFile --Change to layout when testing, index when deploying"
+      writeFile "index.html.hkl" exampleHklFile --Change to layout when testing, index when deploying"
       --Create directory for posts and basic post
       createDirectoryIfMissing True "posts"
       setCurrentDirectory "posts"
