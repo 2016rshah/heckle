@@ -12,21 +12,26 @@ main = do
     ["build"] -> do
       --get all pdf files from directory
       putStrLn "Getting directory contents"
-      fileNamesAndBrokenFiles <- fmap (map getPDF) (getDirectoryContents "posts")
-      let fileNames = rights fileNamesAndBrokenFiles
-      let brokenFiles = lefts fileNamesAndBrokenFiles
+      latexFileNames <- fmap (rights . map getPDF) (getDirectoryContents "posts")
+      mdFileNames <- fmap (rights . map getMD) (getDirectoryContents "posts")
       --print brokenFiles
       --print fileNames
 
       --turn the list of files into a list of posts
       putStrLn "Turning directory contents into posts"
-      postsToBeCreated <- (mapM fileNameToPost fileNames)
-      let posts = (reverse . sort . rights) postsToBeCreated
-      let brokenPosts = lefts postsToBeCreated
-      if length (brokenPosts) > 1 
-        then print brokenPosts
-        else putStrLn "All posts are well formed"
+      latexPostsToBeCreated <- (mapM latexToPost latexFileNames)
+      mdPostsToBeCreated <- (mapM mdToPost mdFileNames)
+      --print mdPostsToBeCreated
+      let posts = (reverse . sort . rights) (mdPostsToBeCreated ++ latexPostsToBeCreated)
       --print posts
+      --let brokenPosts = lefts postsToBeCreated
+      --if length (brokenPosts) > 1 
+      --  then print brokenPosts
+      --  else putStrLn "All posts are well formed"
+      --print posts
+
+      --convert posts to their html if needed
+      mapM_ writeHTML posts
 
       --generate a ul from the list of posts
       putStrLn "Turning posts into an HTML element"
@@ -55,9 +60,10 @@ main = do
       --Create directory for posts and basic post
       createDirectoryIfMissing True "posts"
       setCurrentDirectory "posts"
-      writeFile "example-post.tex" exampleTeXPost
+      writeFile "example-latex.tex" exampleTeXPost
+      writeFile "example-markdown.md" exampleMDPost
       --Compile the LaTeX file into a PDF
-      readProcess "pdflatex" ["example-post.tex"] ""
+      readProcess "pdflatex" ["example-latex.tex"] ""
       print "Success initializing!"
       
     _ -> print "That's not a valid command"
