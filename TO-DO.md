@@ -1,0 +1,14 @@
+#Todo
+ - ~~Templates for index page that I can insert HTML into~~
+ - ~~Modularize code to separate different tasks (extracting info from LaTeX files, creating HTML elements, inserting HTML into layout, etc.)~~
+ - ~~Insert the generated HTML into the layout file~~
+ - ~~Push to hackage~~
+ - ~~Add command line options~~
+ - ~~`heckle init` - Add command line option to set up a bare-bones blog with dummy text and stuff~~
+   - ~~Create a basic template HTML file that's decently pretty, but basic~~
+   - ~~Create a couple sample blog posts~~
+   - ~~Be able to create them from Haskell~~
+ - ~~Format the code before inserting it into the HTML~~
+ - `heckle watch` - Constantly watch layout and posts directory to rebuild on change
+ - ~~Sort posts by the date provided in LaTeX file~~
+ - ~~Add dates to each li element~~
