@@ -1,6 +1,8 @@
-#Heckle
+![Heckle](meta/l3.png)
 
 An easy to use static-site compiler written in Haskell that supports LaTeX/PDF **and** Markdown/HTML posts. 
+
+##Jekyll in Haskell
 
 In other words Heckle is basically **Jekyll in Haskell (feat. LaTeX)**, so a lot of the same benefits apply:
 
