@@ -2,14 +2,9 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                heckle
-version:             2.0.0.1
-synopsis:            Jekyll in Haskell
-description:         Static site generator that lets you write your blog in LaTeX/MD and publish it to github pages.
-description:         Markdown and HTML are the standard tools used to write your every day tech blog with. But they have pretty weak support for embedding mathematical formulas, and are not conducive to writing for an extended period of time. Plus, they aren't even Turing complete! So use BlaTeX to start blogging in LaTeX! (Oh btw you can still use Markdown too tho lol).
-                     .
-                     BlaTeX is basically a static site generator (like Jekyll) that lets you write your blog in LaTeX (and MD), specify a layout file for the homepage, and publish it to github pages.
-                     .
-                     To get started, check out <https://github.com/2016rshah/BlaTeX#how-to>
+version:             2.0.0.2
+synopsis:            Jekyll in Haskell (feat. LaTeX)
+description:         A static site generator that supports LaTeX/PDF and Markdown/HTML posts. Care has been taken to make it configurable, easy to use, and unopinionated. 
 homepage:            https://github.com/2016rshah/heckle
 license:             MIT
 author:              Rushi Shah
