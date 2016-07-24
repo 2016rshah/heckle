@@ -22,6 +22,10 @@ exampleMDPost = unlines
                 , "This is an example MD/HTML post"
                 ]
  
-exampleHklFile :: String
-exampleHklFile = unlines
+exampleIndexFile :: String
+exampleIndexFile = unlines
                   [ "<ul id='blog-posts'></ul>"]
+
+exampleTemplateFile :: String
+exampleTemplateFile = unlines
+                  [ "<div id='blog-post'></div>"]

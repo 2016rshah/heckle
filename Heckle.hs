@@ -5,8 +5,6 @@
 module Heckle where
 
 --Stuff for BlazeHTML
-import Control.Monad (forM_)
-
 import Text.Blaze.Html5 as H hiding (main, map)
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Pretty
@@ -57,12 +55,13 @@ postsToHtml xs = do
 
 --DRY
 postToHtml :: Post -> Html
-postToHtml p@(MD _ _ _ _) = li ! class_ "blog-post" $ do
-        a ! class_ "post-link" ! href (stringValue ("posts/"++fileName p++".html")) $ toHtml (postTitle p)
+postToHtml p = li ! class_ "blog-post" $ do
+        a ! class_ "post-link" ! href (stringValue ("posts/"++fileName p++ext)) $ toHtml (postTitle p)
         H.div ! class_ "post-date" $ toHtml ((displayDate . postDate) p)
-postToHtml p@(LaTeX _ _ _ _) = li ! class_ "blog-post" $ do
-        a ! class_ "post-link" ! href (stringValue ("posts/"++fileName p++".pdf")) $ toHtml (postTitle p)
-        H.div ! class_ "post-date" $ toHtml ((displayDate . postDate) p)
+        where
+          ext = case p of
+            (MD _ _ _ _) -> ".html"
+            (LaTeX _ _ _ _) -> ".pdf"
         
 data Post 
   = LaTeX {
@@ -81,16 +80,6 @@ data Post
 
 instance Ord Post where
   compare p1 p2 = compare (postDate p1) (postDate p2)
-
-getPDF :: FilePath -> Either String String
-getPDF s = case splitOn "." s of
-             [fn, "pdf"] -> Right fn 
-             _ -> Left "Not a PDF file"
-
-getMD :: FilePath -> Either String String
-getMD s = case splitOn "." s of
-            [fn, "md"] -> Right fn
-            _ -> Left "Not a PDF file"
 
 extractFromArgs :: String -> [[TeXArg]] -> Either String Text
 extractFromArgs _ (((FixArg (TeXRaw s)):_):_) = Right s
@@ -111,10 +100,9 @@ So this is just a cleaner function to parse absolute dates
 I also wanted to stick with strings for error messages, so this just shows the ParseErrors from parseDate
 -}
 parseAbsoluteDate :: String -> Either String DateTime
-parseAbsoluteDate s = case parseDate fakeNow s of
+parseAbsoluteDate s = case parseDate mempty s of
  (Left e) -> Left (show e)
  (Right res) -> (Right res)
- where fakeNow = DateTime 0 0 0 0 0 0
 
 getMeta :: (Meta -> [Inline]) -> Pandoc -> Either String String
 getMeta f (Pandoc m _) = case f m of
@@ -137,25 +125,34 @@ createLaTeXPost s (Right t) =
     date = (getCommandValue "date" t) >>= parseAbsoluteDate -- Either monad
     title = getCommandValue "title" t
 
-mdToPost :: String -> IO (Either String Post)
-mdToPost fn = do
-  native <- fmap (readMarkdown def) (readFile ("posts/" ++ fn ++ ".md"))
-  return (createMDPost fn native)
+fileToPost :: String -> IO (Either String Post)
+fileToPost fn = 
+  case splitOn "." fn of
+    [fn, "pdf"] -> do
+      latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
+      return (createLaTeXPost fn latexFile)
+    [fn, "md"] -> do
+      native <- fmap (readMarkdown def) (readFile ("posts/" ++ fn++".md"))
+      return (createMDPost fn native)
+    _ -> return (Left "Not a LaTeX or MD file")
 
-latexToPost :: String -> IO (Either String Post) 
-latexToPost fn = do
-  latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
-  return (createLaTeXPost fn latexFile)
+injectIndex :: String -> Html -> Either String String 
+injectIndex layout ul = injectAt [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] layout (show ul)
 
-injectPosts :: String -> Html -> Either String String 
-injectPosts layout ul = case splitFile of
-                        [beginning, end] -> Right (renderTags (beginning ++ parseTags (show ul) ++ end))
-                        _ ->  Left "Broken layout file"
-  where
-    splitFile = splitOn [(TagOpen "ul" [("id","blog-posts")]), (TagClose "ul")] (parseTags layout)
+injectTemplate :: String -> Post -> Either String String 
+injectTemplate layout (MD fn _ _ t) = injectAt tags layout inp 
+  where 
+    tags = [(TagOpen "div" [("id","blog-post")]), (TagClose "div")]
+    inp = "<div id='blog-post'>" ++ (writeHtmlString def t) ++ "</div>"
 
-writeHTML :: Post -> IO ()
-writeHTML (MD fn _ _ t) = do
-  let html = writeHtmlString def t
-  writeFile ("posts/" ++ fn ++ ".html") html 
-writeHTML (LaTeX _ _ _ _) = return ()
+injectAt :: [Text.HTML.TagSoup.Tag String] -> String -> String -> Either String String
+injectAt p layout insert = case splitOn p (parseTags layout) of 
+  [beg, end] -> Right (renderTags (beg ++ parseTags insert ++ end))
+  _ -> Left "Broken layout file"
+
+writeHTML :: String -> Post -> IO ()
+writeHTML template p@(MD fn _ _ t) = do
+  case injectTemplate template p of
+    Right html -> writeFile ("posts/" ++ fn ++ ".html") html 
+    _ -> return ()
+writeHTML _ (LaTeX _ _ _ _) = return ()

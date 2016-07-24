@@ -10,59 +10,39 @@ main = do
   args <- getArgs
   case args of
     ["build"] -> do
-      --get all pdf files from directory
-      putStrLn "Getting directory contents"
-      latexFileNames <- fmap (rights . map getPDF) (getDirectoryContents "posts")
-      mdFileNames <- fmap (rights . map getMD) (getDirectoryContents "posts")
-      --print brokenFiles
-      --print fileNames
+      
+      putStrLn "Reading directory and turning into native posts"
+      postsToBeCreated <- mapM fileToPost =<< (getDirectoryContents "posts")
+      let posts = (reverse . sort . rights) (postsToBeCreated)
 
-      --turn the list of files into a list of posts
-      putStrLn "Turning directory contents into posts"
-      latexPostsToBeCreated <- (mapM latexToPost latexFileNames)
-      mdPostsToBeCreated <- (mapM mdToPost mdFileNames)
-      --print mdPostsToBeCreated
-      let posts = (reverse . sort . rights) (mdPostsToBeCreated ++ latexPostsToBeCreated)
-      --print posts
-      --let brokenPosts = lefts postsToBeCreated
-      --if length (brokenPosts) > 1 
-      --  then print brokenPosts
-      --  else putStrLn "All posts are well formed"
-      --print posts
+      putStrLn "Writing markdown files into template HTML"
+      template <- readFile "template.html.hkl"
+      mapM_ (writeHTML template) posts
 
-      --convert posts to their html if needed
-      mapM_ writeHTML posts
-
-      --generate a ul from the list of posts
-      putStrLn "Turning posts into an HTML element"
+      putStrLn "Creating HTML <ul> element for index file"
       let generatedHtml = postsToHtml posts
-      --print generatedHtml
 
-      --read the layout file
-      putStrLn "Reading the layout file"
+      putStrLn "Inserting HTML <ul> element into layout file"
       layoutFile <- readFile "index.html.hkl"
-
-      --put the ul into the layout file
-      putStrLn "Inserting HTML element into layout file"
-      let injectedOutput = layoutFile `injectPosts` generatedHtml
+      let injectedOutput = layoutFile `injectIndex` generatedHtml
       case injectedOutput of
         (Left e) -> putStrLn e
         (Right s) -> do
-          --put the results into the index.html file
-          putStrLn "Writing resulting file into index.html"
           writeFile "index.html" s
           putStrLn "Success building!"
 
 
     ["init"] -> do
       --Create the basic layout file
-      writeFile "index.html.hkl" exampleHklFile --Change to layout when testing, index when deploying"
+      writeFile "index.html.hkl" exampleIndexFile --Change to layout when testing, index when deploying"
+      writeFile "template.html.hkl" exampleTemplateFile
       --Create directory for posts and basic post
       createDirectoryIfMissing True "posts"
       setCurrentDirectory "posts"
       writeFile "example-latex.tex" exampleTeXPost
       writeFile "example-markdown.md" exampleMDPost
       --Compile the LaTeX file into a PDF
+      --Could do this for every .tex file if wanted to
       readProcess "pdflatex" ["example-latex.tex"] ""
       print "Success initializing!"
       

@@ -23,6 +23,7 @@ When you're ready, from that directory run `heckle init`. That will create a ske
 ```bash
 .
 ├── index.html.hkl
+├── template.html.hkl
 └── posts
     ├── example-latex.pdf
     ├── example-latex.tex
@@ -60,19 +61,36 @@ If you want an example of a decent looking blog, rather than just the skeleton, 
 
 ###LaTeX Posts
 
-Heckle will find all the `.tex` and `.pdf` file pairs in the `posts/` directory and aggregate links to them in your homepage. You will need to compile them yourself (with `pdflatex` probably) just like you normally would and make sure the resulting PDFs look nice. **You need to ensure that you include a `\title` and a `\date`**. Make sure you format the date as `\date{1 January 2016}` otherwise Heckle won't find your post! When you're satisfied, you can run `heckle build` again to update the blog. 
+Heckle will find all the `.tex` and `.pdf` file pairs in the `posts/` directory and aggregate links to them in your homepage. You will need to compile them yourself (with `pdflatex` probably) just like you normally would and make sure the resulting PDFs look nice. 
+
+**You need to ensure that you include a `\title` and a `\date` in the preamble of every LaTeX file**. Make sure you format the date as `\date{1 January 2016}` otherwise Heckle won't find your post! 
+
+```tex
+\date{1 January 2015}
+\title{Example LaTeX Post}
+```
+
+When you're satisfied, you can run `heckle build` again to update the blog. 
 
 ###Markdown Posts
 
-Heckle will find all the `.md` files, convert them to `.html` with the help of [Pandoc](http://pandoc.org/), and aggregate links to them in your homepage. **You need to ensure that you include commented meta-data (outlined below) including the title, author, and date**. Make sure you format the date as `1 January 2016` otherwise Heckle won't find your post! When you're satisfied, you can run `heckle build` again to update the blog. 
+The `template.html.hkl` file is basically the layout file for your Markdown blog posts. Just make sure it is a valid HTML file (with Javascript, CSS, whatever you want) and make sure to keep the following HTML element wherever you want your blog post content:
 
-The first three lines of each markdown file need to be formatted as follows (the date format is `1 January 2016`):
+```html
+<div id="blog-post"></div>
+```
+
+**You need to ensure that you include commented meta-data (outlined below) including the title, author, and date in every Markdown file**. Make sure you format the date as `1 January 2016` otherwise Heckle won't find your post! The first three lines of each markdown file need to be formatted as follows (the date format is `1 January 2016`):
 
 ```markdown
 % <TITLE>
 % <AUTHOR>
 % <FORMATTED-DATE>
 ```
+
+Heckle will find all the `.md` files and convert them to `.html` with the help of [Pandoc](http://pandoc.org/). Then it will insert the resulting HTML into your `template.html.hkl` file at the specified location. Finally, it aggregates links to all the posts in your homepage. 
+
+When you're satisfied, you can run `heckle build` again to update the blog. 
 
 ###Notes
 
