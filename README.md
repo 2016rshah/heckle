@@ -1,6 +1,6 @@
 ![Heckle](meta/l3.png)
 
-An easy to use static-site compiler written in Haskell that supports LaTeX/PDF **and** Markdown/HTML posts. 
+An easy to use static-site compiler written in Haskell that supports LaTeX/PDF **and** Markdown/HTML posts. Care has been taken to make it as simple and unopinionated as possible. 
 
 ##Jekyll in Haskell
 
@@ -95,8 +95,6 @@ When you're satisfied, you can run `heckle build` again to update the blog.
 ###Notes
 
 If you don't want to run `heckle build` every time you change a file, look into [SOS](https://github.com/schell/steeloverseer) or [Gulp](http://gulpjs.com/). 
-
-I'm currently looking into how to style the Markdown posts to not just be raw HTML. I have a few ideas that I haven't gotten around to checking, but if you have suggestions, please let me know. 
 
 #BlaTeX ?
 This project used to be called BlaTeX and was specifically for LaTeX/PDF posts (it did not support Markdown/HTML). It was created over the course of my senior year in high-school as my [senior research project](https://github.com/2016rshah/Meta-BlaTeX). Eventually I decided to [support Markdown as well](https://github.com/2016rshah/heckle/issues/5) and thus Heckle was born.
