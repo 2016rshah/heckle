@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                heckle
-version:             2.0.0.2
+version:             2.0.0.3
 synopsis:            Jekyll in Haskell (feat. LaTeX)
 description:         A static site generator that supports LaTeX/PDF and Markdown/HTML posts. Care has been taken to make it configurable, easy to use, and unopinionated. 
 homepage:            https://github.com/2016rshah/heckle
@@ -18,18 +18,16 @@ executable heckle
   main-is:             Main.hs
   -- other-modules:       
   other-extensions:    OverloadedStrings
-  build-depends:       HaTeX >=3.17.0.1 && <3.18
-                     , base >=4.7 && <4.8
+  build-depends:     base >=4.7 && <4.8
                      , blaze-html >= 0.8.1.1
                      , directory >=1.2 && <1.3
                      , process >= 1.2.0.0
                      , split >=0.2 && <0.3
                      , tagsoup >= 0.13.3
-                     , text >=1.1 && <1.2
                      , dates >= 0.2.2.1
                      , pandoc >= 1.17.0.3
                      , pandoc-types >= 1.16.1
-                     , containers >= 0.5.5.1
+                     
   -- hs-source-dirs:      
   default-language:    Haskell2010
   other-modules:       Files

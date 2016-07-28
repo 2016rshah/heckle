@@ -9,13 +9,6 @@ import Text.Blaze.Html5 as H hiding (main, map)
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Pretty
 
---Stuff for HaTeX
-import Text.LaTeX hiding (unlines)
-import Text.LaTeX.Base.Parser
-import Text.LaTeX.Base.Syntax
-import Data.Text (pack, unpack)
-import qualified Data.Text.IO as T
-
 --Stuff for TagSoup
 import Text.HTML.TagSoup
 
@@ -25,6 +18,7 @@ import Data.Dates
 --Pandoc
 import Text.Pandoc.Options
 import Text.Pandoc.Readers.Markdown
+import Text.Pandoc.Readers.LaTeX
 import Text.Pandoc.Definition
 import Text.Pandoc.Writers.HTML
 import Text.Pandoc.Shared
@@ -33,8 +27,8 @@ import Text.Pandoc.Shared
 import Data.List.Split
 import Data.Either
 import Control.Applicative
-import Data.Map.Lazy as Map (lookup)
 import Control.Monad
+import Data.Monoid
 
 instance Show Html where
   show = renderHtml
@@ -53,7 +47,6 @@ postsToHtml xs = do
   ul ! A.id "blog-posts" $
     forM_ xs postToHtml
 
---DRY
 postToHtml :: Post -> Html
 postToHtml p = li ! class_ "blog-post" $ do
         a ! class_ "post-link" ! href (stringValue ("posts/"++fileName p++ext)) $ toHtml (postTitle p)
@@ -68,7 +61,7 @@ data Post
   fileName :: String
   , postTitle :: String
   , postDate :: DateTime
-  , syntaxTree :: LaTeX
+  , pd :: Pandoc
     }
   | MD {
   fileName :: String
@@ -80,14 +73,6 @@ data Post
 
 instance Ord Post where
   compare p1 p2 = compare (postDate p1) (postDate p2)
-
-extractFromArgs :: String -> [[TeXArg]] -> Either String Text
-extractFromArgs _ (((FixArg (TeXRaw s)):_):_) = Right s
-extractFromArgs s [] = Left ("Command not found: " ++ s)
-extractFromArgs s _ = Left ("Could not parse arguments passed to " ++ s ++ " command")
-
-getCommandValue :: String -> LaTeX -> Either String String
-getCommandValue s = (fmap unpack . extractFromArgs s . lookForCommand s) 
 
 {-
 Relative dates aren't supported by BlaTeX
@@ -109,31 +94,29 @@ getMeta f (Pandoc m _) = case f m of
   [] -> Left "Couldn't find it"
   (xs) -> Right (stringify xs)
 
-createMDPost :: Show a => String -> Either a Pandoc -> Either String Post
-createMDPost _ (Left e) = Left (show e)
-createMDPost fn (Right pd) = 
-  MD <$> pure fn <*> title <*> date <*> pure pd
+--Creates a post given a constructor for a post
+--The long function in the type signature is just
+--A constructor for a post (Either `LaTeX` or `MD`)
+createPost :: Show a =>
+     (String -> String -> DateTime -> Pandoc -> Post)
+     -> String -> Either a Pandoc -> Either String Post
+createPost _ _ (Left e) = Left (show e)
+createPost t fn (Right pd) = 
+  t <$> pure fn <*> title <*> date <*> pure pd
   where
     date = (getMeta docDate pd) >>= parseAbsoluteDate
     title = getMeta docTitle pd
---Make more DRY
-createLaTeXPost :: String -> Either ParseError LaTeX -> Either String Post
-createLaTeXPost _ (Left err) = Left (show err) -- Just `show` a ParseError to stick with Strings as error messages
-createLaTeXPost s (Right t) = 
-  LaTeX <$> pure s <*> title <*> date <*> pure t
-  where 
-    date = (getCommandValue "date" t) >>= parseAbsoluteDate -- Either monad
-    title = getCommandValue "title" t
 
 fileToPost :: String -> IO (Either String Post)
 fileToPost fn = 
   case splitOn "." fn of
     [fn, "pdf"] -> do
-      latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
-      return (createLaTeXPost fn latexFile)
+      -- latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
+      latexFile <- fmap (readLaTeX def) (readFile ("posts/" ++ fn ++ ".tex"))
+      return (createPost LaTeX fn latexFile)
     [fn, "md"] -> do
-      native <- fmap (readMarkdown def) (readFile ("posts/" ++ fn++".md"))
-      return (createMDPost fn native)
+      native <- fmap (readMarkdown def) (readFile ("posts/" ++ fn ++".md"))
+      return (createPost MD fn native)
     _ -> return (Left "Not a LaTeX or MD file")
 
 injectIndex :: String -> Html -> Either String String 

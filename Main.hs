@@ -14,6 +14,7 @@ main = do
       putStrLn "Reading directory and turning into native posts"
       postsToBeCreated <- mapM fileToPost =<< (getDirectoryContents "posts")
       let posts = (reverse . sort . rights) (postsToBeCreated)
+      putStrLn ("Number of posts found: " ++ (show (length posts)))
 
       putStrLn "Writing markdown files into template HTML"
       template <- readFile "template.html.hkl"
