@@ -36,6 +36,8 @@ Now finally you can do `heckle build` to generate your site. If that succeeds, y
 
 At this point, if you open the resulting `index.html` file, everything will look pretty awful. But luckily, you can customize just about everything. 
 
+(Also, if you want to get up and running quickly with [the Hyde theme](https://github.com/poole/hyde), follow the instructions in [this README](https://github.com/2016rshah/blog). It will look like [my blog](http://www.rshah.org/blog/) rather than just the skeleton and you can edit things from there.) 
+
 ###Homepage
 
 The `index.html.hkl` will basically be the layout you want for the homepage of your blog. Just make sure it is a valid HTML file (with Javascript, CSS, whatever you want) and make sure to keep the following HTML element wherever you want the list of your blog posts to go:
@@ -56,8 +58,6 @@ Each blog post will be an `li` element (with the class `blog-post`) containing a
     </div>
 </li>
 ```
-
-If you want an example of a decent looking blog, rather than just the skeleton, you can use [this example `index.html.hkl` file](https://github.com/2016rshah/blog/blob/gh-pages/index.html.hkl). You could also just follow the instructions given in [the README](https://github.com/2016rshah/blog/). 
 
 ###LaTeX Posts
 

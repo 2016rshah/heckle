@@ -6,7 +6,7 @@ exampleTeXPost = unlines
                  [ "\\documentclass{article}"
                  , "\\author{Rushi Shah}"
                  , "\\date{1 January 2015}"
-                 , "\\title{Example Post}"
+                 , "\\title{Example LaTeX Post}"
                  , "\\begin{document}"
                  , "\\maketitle"
                  , "This is an example LaTeX/PDF post."

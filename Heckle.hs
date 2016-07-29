@@ -16,15 +16,15 @@ import Text.HTML.TagSoup
 import Data.Dates
 
 --Pandoc
-import Text.Pandoc.Options
-import Text.Pandoc.Readers.Markdown
-import Text.Pandoc.Readers.LaTeX
+import Text.Pandoc.Options (def)
+import Text.Pandoc.Readers.Markdown (readMarkdown)
+import Text.Pandoc.Readers.LaTeX (readLaTeX)
 import Text.Pandoc.Definition
-import Text.Pandoc.Writers.HTML
-import Text.Pandoc.Shared
+import Text.Pandoc.Writers.HTML (writeHtmlString)
+import Text.Pandoc.Shared (stringify)
 
 --Other stuff I'm using
-import Data.List.Split
+import Data.List.Split (splitOn)
 import Data.Either
 import Control.Applicative
 import Control.Monad
@@ -32,8 +32,6 @@ import Data.Monoid
 
 instance Show Html where
   show = renderHtml
-
---Post {fileName = "example-post", postTitle = "Example Post", postAuthor = "Rushi Shah", postDate = 1 January 2015, 0:0:0, syntaxTree = TeXSeq (TeXComm "documentclass" [FixArg (TeXRaw "article")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "author" [FixArg (TeXRaw "Rushi Shah")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "date" [FixArg (TeXRaw "1 January 2015")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXComm "title" [FixArg (TeXRaw "Example Post")]) (TeXSeq (TeXRaw "\n") (TeXSeq (TeXEnv "document" [] (TeXSeq (TeXRaw "\n") (TeXSeq (TeXCommS "maketitle") (TeXRaw "\nThis is an example LaTeX/PDF post.\n")))) (TeXRaw "\n")))))))))}
 
 showMonth ::  Int -> String
 showMonth i = months !! (i-1)
@@ -96,7 +94,7 @@ getMeta f (Pandoc m _) = case f m of
 
 --Creates a post given a constructor for a post
 --The long function in the type signature is just
---A constructor for a post (Either `LaTeX` or `MD`)
+--A constructor for a post (either `LaTeX` or `MD`)
 createPost :: Show a =>
      (String -> String -> DateTime -> Pandoc -> Post)
      -> String -> Either a Pandoc -> Either String Post
@@ -111,7 +109,6 @@ fileToPost :: String -> IO (Either String Post)
 fileToPost fn = 
   case splitOn "." fn of
     [fn, "pdf"] -> do
-      -- latexFile <- fmap (parseLaTeXWith (ParserConf ["verbatim", "minted"]) . pack) (readFile ("posts/"++fn++".tex"))
       latexFile <- fmap (readLaTeX def) (readFile ("posts/" ++ fn ++ ".tex"))
       return (createPost LaTeX fn latexFile)
     [fn, "md"] -> do
