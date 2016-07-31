@@ -108,12 +108,10 @@ createPost t fn (Right pd) =
 fileToPost :: String -> IO (Either String Post)
 fileToPost fn = 
   case splitOn "." fn of
-    [fn, "pdf"] -> do
-      latexFile <- fmap (readLaTeX def) (readFile ("posts/" ++ fn ++ ".tex"))
-      return (createPost LaTeX fn latexFile)
-    [fn, "md"] -> do
-      native <- fmap (readMarkdown def) (readFile ("posts/" ++ fn ++".md"))
-      return (createPost MD fn native)
+    [fn, "pdf"] -> 
+      return . createPost LaTeX fn  . readLaTeX def =<< readFile ("posts/" ++ fn ++ ".tex")
+    [fn, "md"] -> 
+      return . createPost MD fn . readMarkdown def =<< readFile ("posts/" ++ fn ++ ".md")
     _ -> return (Left "Not a LaTeX or MD file")
 
 injectIndex :: String -> Html -> Either String String 
