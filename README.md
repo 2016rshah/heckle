@@ -2,35 +2,41 @@
 
 An easy to use static-site compiler written in Haskell that supports LaTeX/PDF **and** Markdown/HTML posts. Care has been taken to make it as simple and unopinionated as possible. 
 
-##Jekyll in Haskell
+In other words Heckle is basically **Jekyll in Haskell (feat. LaTeX)**.
 
-In other words Heckle is basically **Jekyll in Haskell (feat. LaTeX)**, so a lot of the same benefits apply:
+#Why
 
- >~~Jekyll~~ Heckle is a simple, blog-aware, static site generator. It takes a template directory containing ~~raw text files in various formats~~ LaTeX files or Markdown files, runs it through a converter ~~(like Markdown) and our Liquid renderer~~ if needed, and spits out a complete, ready-to-publish static website suitable for serving with your favorite web server. ~~Jekyll also happens to be the engine behind GitHub Pages, which means~~ you can use ~~Jekyll~~ Heckle to host your project’s page, blog, or website from GitHub’s servers for free.
+Want to use Markdown? Cool. Want to use LaTeX? Cool. Want to use both? Cool. 
 
-[My own blog](http://www.rshah.org/blog/) uses Heckle with a ported version of [The Hyde Theme](https://github.com/poole/hyde) so it looks like a Jekyll blog, it's more simple to maintain, and it supports LaTeX posts. 
+Also, Jekyll was [too OP](https://jekyllrb.com/docs/structure/) for my taste. I just wanted to [throw some posts in a directory](https://github.com/2016rshah/heckle#how-to) and be ready to roll. [My own blog](http://www.rshah.org/blog/) uses Heckle with a ported version of [The Hyde Theme](https://github.com/poole/hyde) so it looks like a Jekyll blog, it's more simple to maintain, and it supports LaTeX posts. 
 
 #Requirements
  - [The Haskell Platform](https://www.haskell.org/platform/)
  - [LaTeX](https://latex-project.org/ftp.html)
 
+(Currently [considering ways](https://github.com/2016rshah/heckle/issues/9) to make LaTeX an optional dependency)
+
 #How To
 
 First install [Heckle](https://hackage.haskell.org/package/heckle-2.0.0.0) by running `cabal install heckle`. Then create the directory you want your blog to be based in, initialize a git repository, etc.
 
-When you're ready, from that directory run `heckle init`. That will create a skeleton file structure like this:
+When you're ready, from that directory run `heckle init`. That will create a skeleton file structure. 
+
+Now finally you can do `heckle build` to generate your site. If that succeeds, you will have the example blog up and running!
+
+It'll look a little like this:
 
 ```bash
 .
+├── index.html
 ├── index.html.hkl
 ├── template.html.hkl
 └── posts
-    ├── example-latex.pdf
-    ├── example-latex.tex
-    └── example-markdown.md
+    ├── example-latex.pdf
+    ├── example-latex.tex
+    ├── example-markdown.html
+    └── example-markdown.md
 ```
-
-Now finally you can do `heckle build` to generate your site. If that succeeds, you will have the example blog up and running!
 
 #Customizing
 

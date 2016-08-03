@@ -37,6 +37,7 @@ main = do
       --Create the basic layout file
       writeFile "index.html.hkl" exampleIndexFile --Change to layout when testing, index when deploying"
       writeFile "template.html.hkl" exampleTemplateFile
+      writeFile "index.html" exampleResFile
       --Create directory for posts and basic post
       createDirectoryIfMissing True "posts"
       setCurrentDirectory "posts"

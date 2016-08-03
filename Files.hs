@@ -26,6 +26,27 @@ exampleIndexFile :: String
 exampleIndexFile = unlines
                   [ "<ul id='blog-posts'></ul>"]
 
+exampleResFile :: String
+exampleResFile = unlines
+    ["<ul id=\"blog-posts\">"
+    ,"    <li class=\"blog-post\">"
+    ,"        <a class=\"post-link\" href=\"posts/example-markdown.html\">"
+    ,"            Example MD Post"
+    ,"        </a>"
+    ,"        <div class=\"post-date\">"
+    ,"            1 January 2016"
+    ,"        </div>"
+    ,"    </li>"
+    ,"    <li class=\"blog-post\">"
+    ,"        <a class=\"post-link\" href=\"posts/example-latex.pdf\">"
+    ,"            Example Post"
+    ,"        </a>"
+    ,"        <div class=\"post-date\">"
+    ,"            1 January 2015"
+    ,"        </div>"
+    ,"    </li>"
+    ,"</ul>"]
+
 exampleTemplateFile :: String
 exampleTemplateFile = unlines
                   [ "<div id='blog-post'></div>"]
