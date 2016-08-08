@@ -113,3 +113,4 @@ This project used to be called BlaTeX and was specifically for LaTeX/PDF posts (
   - My powerpoint presentations about Haskell/BlaTeX: https://github.com/2016rshah/Meta-BlaTeX/tree/master/Presentations
   - My poster for BlaTeX: https://github.com/2016rshah/Meta-BlaTeX/blob/master/Poster/Poster.pdf
   - The historical repo for BlaTeX: https://github.com/2016rshah/Meta-BlaTeX/tree/master/BlaTeX
+  - How BlaTeX became Heckle: http://www.rshah.org/blog/posts/birth-of-heckle.html
