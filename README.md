@@ -12,9 +12,7 @@ Also, Jekyll was [too OP](https://jekyllrb.com/docs/structure/) for my taste. I 
 
 #Requirements
  - [The Haskell Platform](https://www.haskell.org/platform/)
- - [LaTeX](https://latex-project.org/ftp.html)
-
-(Currently [considering ways](https://github.com/2016rshah/heckle/issues/9) to make LaTeX an optional dependency)
+ - [LaTeX](https://latex-project.org/ftp.html) (optional)
 
 #How To
 

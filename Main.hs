@@ -3,6 +3,7 @@ import Data.Either
 import Data.List
 import System.Environment (getArgs)
 import System.Process (readProcess)
+import Control.Exception
 import Files
 import Heckle
 
@@ -41,11 +42,20 @@ main = do
       --Create directory for posts and basic post
       createDirectoryIfMissing True "posts"
       setCurrentDirectory "posts"
-      writeFile "example-latex.tex" exampleTeXPost
       writeFile "example-markdown.md" exampleMDPost
+      
       --Compile the LaTeX file into a PDF
       --Could do this for every .tex file if wanted to
-      readProcess "pdflatex" ["example-latex.tex"] ""
-      print "Success initializing!"
+      writeFile "example-latex.tex" exampleTeXPost
+      x <- try (readProcess "pdflatex" ["example-latex.tex"] "")
+      case x of
+      	Left e -> do
+      		let err = show (e :: IOException)
+      		putStrLn "Warning: LaTeX installation not found, removing LaTeX post"
+      		removeFile "example-latex.tex"
+      		return "LaTeX not found"
+      	Right r -> return "Success"
+
+      putStrLn "Success initializing!"
       
-    _ -> print "That's not a valid command"
+    _ -> putStrLn "That's not a valid command"
