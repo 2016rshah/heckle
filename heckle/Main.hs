@@ -1,17 +1,20 @@
-import System.Directory 
+module Main where
+
+import Control.Exception
 import Data.Either
 import Data.List
+import System.Directory
 import System.Environment (getArgs)
-import System.Process (readProcess)
-import Control.Exception
-import Files
+import System.Process     (readProcess)
+
 import Heckle
+import Files
 
 main = do
   args <- getArgs
   case args of
     ["build"] -> do
-      
+
       putStrLn "Reading directory and turning into native posts"
       postsToBeCreated <- mapM fileToPost =<< (getDirectoryContents "posts")
       let posts = (reverse . sort . rights) (postsToBeCreated)
@@ -43,19 +46,19 @@ main = do
       createDirectoryIfMissing True "posts"
       setCurrentDirectory "posts"
       writeFile "example-markdown.md" exampleMDPost
-      
+
       --Compile the LaTeX file into a PDF
       --Could do this for every .tex file if wanted to
       writeFile "example-latex.tex" exampleTeXPost
       x <- try (readProcess "pdflatex" ["example-latex.tex"] "")
       case x of
-      	Left e -> do
-      		let err = show (e :: IOException)
-      		putStrLn "Warning: LaTeX installation not found, removing LaTeX post"
-      		removeFile "example-latex.tex"
-      		return "LaTeX not found"
-      	Right r -> return "Success"
+        Left e -> do
+            let err = show (e :: IOException)
+            putStrLn "Warning: LaTeX installation not found, removing LaTeX post"
+            removeFile "example-latex.tex"
+            return "LaTeX not found"
+        Right r -> return "Success"
 
       putStrLn "Success initializing!"
-      
+
     _ -> putStrLn "That's not a valid command"

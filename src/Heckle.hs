@@ -22,12 +22,12 @@ import qualified Text.HTML.TagSoup as TagSoup
 
 import Data.Dates
 
-import Text.Pandoc.Options (def)
-import Text.Pandoc.Readers.Markdown (readMarkdown)
-import Text.Pandoc.Readers.LaTeX (readLaTeX)
 import Text.Pandoc.Definition
-import Text.Pandoc.Writers.HTML (writeHtmlString)
-import Text.Pandoc.Shared (stringify)
+import Text.Pandoc.Options          (def)
+import Text.Pandoc.Readers.LaTeX    (readLaTeX)
+import Text.Pandoc.Readers.Markdown (readMarkdown)
+import Text.Pandoc.Shared           (stringify)
+import Text.Pandoc.Writers.HTML     (writeHtmlString)
 
 instance Show Html where
   show = renderHtml
@@ -85,17 +85,20 @@ data Post = Post
   }  deriving (Show, Eq)
 
 instance Ord Post where
-  compare p1 p2 = compare (postDate p1) (postDate p2)
+  compare = compare `on` postDate
 
--- | Relative dates aren't supported by BlaTeX
--- (it makes no sense for a post to always be written "yesterday", a specific date should be given)
--- However parsing the date requires the current datetime to be given to parse relative dates
--- Originally I went through the IO hurdles of getting current datetime
--- But that introduced unnecessary sideeffects
--- So this is just a cleaner function to parse absolute dates
--- (It will give nonsensical results for relative dates: use carefully!)
--- I also wanted to stick with strings for error messages, so this just shows the ParseErrors from parseDate
+-- | Relative dates aren't supported by BlaTeX (it makes no sense for a post to
+-- always be written "yesterday", a specific date should be given) However
+-- parsing the date requires the current datetime to be given to parse relative
+-- dates.
 --
+-- Originally I went through the IO hurdles of getting current datetime, but
+-- that introduced unnecessary side-effects so this is just a cleaner function
+-- to parse absolute dates. (It will give nonsensical results for relative
+-- dates: use carefully!)
+--
+-- I also wanted to stick with strings for error messages, so this just shows
+-- the ParseErrors from parseDate
 parseAbsoluteDate :: String -> Either String DateTime
 parseAbsoluteDate = first show . parseDate mempty
 
@@ -135,7 +138,7 @@ injectTemplate :: String -> Post -> Either String String
 injectTemplate layout (Post _ _ _ Markdown pd) = injectAt tags layout inp
   where
     tags = [(TagSoup.TagOpen "div" [("id","blog-post")]), (TagSoup.TagClose "div")]
-    inp  = "<div id='blog-post'>" ++ (writeHtmlString def pd) ++ "</div>"
+    inp  = "<div id='blog-post'>" <> writeHtmlString def pd <> "</div>"
 
 injectAt :: [TagSoup.Tag String] -> String -> String -> Maybe String
 injectAt p layout insert = case splitOn p (parseTags layout) of
@@ -148,5 +151,5 @@ writeHTML template Post{..} =
     LaTeX -> return ()
     Markdown -> do
       case injectTemplate template p of
-        Right html -> writeFile ("posts/" ++ fileName ++ ".html") html
+        Right html -> writeFile ("posts/" <> fileName <> ".html") html
         Left     _ -> return ()
