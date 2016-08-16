@@ -10,7 +10,10 @@ import Control.Applicative
 import Control.Monad
 import Data.Bifunctor
 import Data.Either
+import Data.Function (on)
+import Data.List
 import Data.List.Split (splitOn)
+import Data.String (IsString)
 import Data.Monoid
 import System.FilePath
 
@@ -20,9 +23,9 @@ import Text.Blaze.Html.Renderer.Pretty
 
 import qualified Text.HTML.TagSoup as TagSoup
 
-import Data.Dates
+import Data.Dates hiding (month)
 
-import Text.Pandoc.Definition
+import Text.Pandoc.Definition hiding (Format)
 import Text.Pandoc.Options          (def)
 import Text.Pandoc.Readers.LaTeX    (readLaTeX)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
@@ -66,18 +69,19 @@ postToHtml Post{..} = li ! class_ "blog-post" $ do
   where
     ext = getOutputExtension format
 
-data InputFormat =
+--data InputFormat =
 data Format = LaTeX | Markdown
+  deriving (Show, Eq)
 
 getOutputExtension :: Format -> String
 getOutputExtension LaTeX    = ".pdf"
 getOutputExtension Markdown = ".html"
 
-data FileName = FileName { getFileName :: String, getExtension ::  }
+-- data FileName = FileName { getFileName :: String, getExtension ::  }
 newtype Title = Title { getTitle :: String } deriving (Show, Eq, IsString)
 
 data Post = Post
-  { fileName    :: FileName
+  { fileName    :: String  -- TODO make this more typed
   , postTitle   :: Title
   , postDate    :: DateTime
   , format      :: Format
@@ -111,7 +115,7 @@ getMeta f (Pandoc m _) = case f m of
 createPost
   :: Show a
   => Format
-  -> FileName
+  -> String
   -> Either a Pandoc
   -> Either String Post
 createPost _ _ (Left e) = Left (show e)
@@ -120,9 +124,9 @@ createPost format fileName (Right pd) = Post{..}
     postTitle = getMeta docTitle pd
     postDate  = getMeta docDate pd >>= parseAbsoluteDate
 
-fileToPost :: FileName -> IO (Either String Post)
-fileToPost (FileName fn) =
-  case splitExtension fn of
+fileToPost :: String -> IO (Either String Post)
+fileToPost fileName =
+  case splitExtension fileName of
     (name, ".pdf") ->
       return . createPost LaTeX name . readLaTeX def =<< readFile ("posts/" <> name <> ".tex")
     (name, ".md") ->
@@ -130,7 +134,7 @@ fileToPost (FileName fn) =
     _ -> pure (Left "Not a LaTeX or MD file")
 
 injectIndex :: String -> Html -> Either String String
-injectIndex layout ul = injectAt [ (TagOpen "ul" [("id","blog-posts")])
+injectIndex layout ul = injectAt [ (TagSoup.TagOpen "ul" [("id","blog-posts")])
                                  , (TagSoup.TagClose "ul")]
                                  layout (show ul)
 
@@ -141,8 +145,8 @@ injectTemplate layout (Post _ _ _ Markdown pd) = injectAt tags layout inp
     inp  = "<div id='blog-post'>" <> writeHtmlString def pd <> "</div>"
 
 injectAt :: [TagSoup.Tag String] -> String -> String -> Maybe String
-injectAt p layout insert = case splitOn p (parseTags layout) of
-  [beg, end] -> Just $ renderTags (beg <> parseTags insert <> end)
+injectAt p layout insert = case splitOn p (TagSoup.parseTags layout) of
+  [beg, end] -> Just $ TagSoup.renderTags (beg <> TagSoup.parseTags insert <> end)
   _          -> Nothing
 
 writeHTML :: String -> Post -> IO ()
