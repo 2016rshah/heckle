@@ -34,13 +34,11 @@ executable heckle
   main-is:           Main.hs
   build-depends:     base >=4.7 && <5
                    , heckle
-                   , blaze-html >= 0.8.1.1
                    , directory >=1.2 && <1.3
+                   , filepath >= 1.4.0.0
                    , process >= 1.2.0.0
                    , split >=0.2 && <0.3
-                   , tagsoup >= 0.13.3
-                   , dates >= 0.2.2.1
-                   , pandoc >= 1.17.0.3
-                   , pandoc-types >= 1.16.1
+                   , optparse-applicative >= 0.12.0.0 && <0.13.0.0
+                   , optparse-generic ==1.1.*
   other-extensions:  OverloadedStrings
   default-language:  Haskell2010
