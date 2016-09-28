@@ -204,3 +204,5 @@ sympy-plots-for-*.tex/
 *.xdy
 
 _minted*
+
+.stack_work/
