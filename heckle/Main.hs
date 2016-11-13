@@ -59,10 +59,6 @@ buildSite = do
 
 initSite :: IO ()
 initSite = do
-  --curDir <- getCurrentDirectory
-  let example = "example"
-  createDirectoryIfMissing True example
-  setCurrentDirectory example
 
   -- Create the basic layout file
   writeFile "index.html.hkl" exampleIndexFile -- Change to layout when testing, index when deploying"
