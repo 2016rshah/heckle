@@ -108,7 +108,7 @@ These are the valid date formats:
  - `9:47AM 1 January 2016`
  - `9:47AM January 1, 2016`
 
- Feel free to mix and match between the formats. If you would like to support a different date format, let me know by opening [an issue](https://github.com/2016rshah/heckle#how-to).  
+Feel free to mix and match between the formats. If you would like to support a different date format, let me know by opening [an issue](https://github.com/2016rshah/heckle/issues).  
 
 #BlaTeX ?
 This project used to be called BlaTeX and was specifically for LaTeX/PDF posts (it did not support Markdown/HTML). It was created over the course of my senior year in high-school as my [senior research project](https://github.com/2016rshah/Meta-BlaTeX). Eventually I decided to [support Markdown as well](https://github.com/2016rshah/heckle/issues/5) and thus Heckle was born.
