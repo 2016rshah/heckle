@@ -23,7 +23,16 @@ import Text.Blaze.Html.Renderer.Pretty
 
 import qualified Text.HTML.TagSoup as TagSoup
 
-import Data.Dates hiding (month)
+import Data.Time
+-- parseTimeM True defaultTimeLocale "%d %B %Y" "12 January 2016" :: Maybe UTCTime
+
+--https://hackage.haskell.org/package/base-4.9.0.0/docs/Data-Maybe.html figure out how to optionally match either with hh:mm:ss or without it
+--https://hackage.haskell.org/package/time-1.7/docs/Data-Time-Format.html
+--http://hackage.haskell.org/package/time-1.7/docs/Data-Time-Clock.html#t:UTCTime
+--https://hackage.haskell.org/package/time-1.7/docs/Data-Time-Format.html
+--https://lotz84.github.io/haskellbyexample/ex/time-formatting-parsing
+-- 
+
 
 import Text.Pandoc.Definition hiding (Format)
 import Text.Pandoc.Options          (def)
@@ -53,9 +62,9 @@ data Month
 month :: Int -> Month
 month n = toEnum (n-1)
 
-displayDate :: DateTime -> String
-displayDate (DateTime y m d h mins s) =
-  intercalate " " [ show d, show (month m), show y ]
+displayDate :: UTCTime -> String
+displayDate t = formatTime defaultTimeLocale "%-d %B %Y" t
+
 
 postsToHtml :: [Post] -> Html
 postsToHtml xs = do
@@ -78,33 +87,40 @@ getOutputExtension LaTeX    = ".pdf"
 getOutputExtension Markdown = ".html"
 
 -- data FileName = FileName { getFileName :: String, getExtension ::  }
-newtype Title = Title { getTitle :: String } deriving (Show, Eq, IsString, ToMarkup)
+newtype Title = Title { getTitle :: String } 
+  deriving (Show, Eq, IsString, ToMarkup)
 
 data Post = Post
   { fileName    :: String  -- TODO make this more typed
   , postTitle   :: Title
-  , postDate    :: DateTime
+  , postDate    :: UTCTime
   , format      :: Format
   , pd          :: Pandoc
-  }  deriving (Show, Eq)
+  }  
+  deriving (Show, Eq)
 
 instance Ord Post where
   compare = compare `on` postDate
 
--- | Relative dates aren't supported by BlaTeX (it makes no sense for a post to
--- always be written "yesterday", a specific date should be given) However
--- parsing the date requires the current datetime to be given to parse relative
--- dates.
---
--- Originally I went through the IO hurdles of getting current datetime, but
--- that introduced unnecessary side-effects so this is just a cleaner function
--- to parse absolute dates. (It will give nonsensical results for relative
--- dates: use carefully!)
---
--- I also wanted to stick with strings for error messages, so this just shows
--- the ParseErrors from parseDate
-parseAbsoluteDate :: String -> Either String DateTime
-parseAbsoluteDate = first show . parseDate mempty
+parseAbsoluteDate :: String -> Either String UTCTime
+parseAbsoluteDate s = case parseAbsoluteDate' s of
+  Just a -> Right a
+  Nothing -> Left "Date does not match valid formats"
+
+
+{--
+Valid formats:
+6 January 2012
+January 6, 2012
+9:47AM 6 January 2012
+9:47AM January 6, 2012
+--}
+parseAbsoluteDate' :: String -> Maybe UTCTime 
+parseAbsoluteDate' s = foldr (<|>) Nothing results  
+  where
+    results = map ($ s) options
+    options = map (parseTimeM True defaultTimeLocale) formats
+    formats = ["%-d %B %Y", "%B %-d, %Y", "%-l:%M%p %-d %B %Y", "%-l:%M%p %B %-d, %Y"]
 
 getMeta :: (Meta -> [Inline]) -> Pandoc -> Either String String
 getMeta f (Pandoc m _) = case f m of
