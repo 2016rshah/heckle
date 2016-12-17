@@ -10,12 +10,17 @@ import System.FilePath
 import System.Environment (getArgs)
 import System.Process     (readProcess)
 
+import Paths_heckle (version)
+import Data.Version (showVersion)
+
+
 import Heckle
 import Files
 
 data Command
   = Build
   | Init
+  | Version
 
 withInfo :: InfoMod a -> Parser a -> ParserInfo a
 withInfo im p = info (helper <*> p) im
@@ -29,9 +34,11 @@ mainFlags = withInfo (fullDesc <> progDesc "heckle: a simple, configurable stati
     parser :: Parser Command
     parser = subparser $ mconcat
       [ command "build" $ "Generate site"
-           ==> pure Build
+        ==> pure Build
       , command "init" $ "Make new site template"
-           ==> pure Init
+        ==> pure Init
+      , command "version" $ "Get the package version"
+        ==> pure Version
       ]
 
 buildSite :: IO ()
@@ -84,8 +91,12 @@ initSite = do
 
   putStrLn "Success initializing!"
 
+versionOfSite :: IO ()
+versionOfSite = putStrLn ("heckle " ++ showVersion version)
+
 main = do
     command <- execParser mainFlags
     case command of
       Build -> buildSite
       Init  -> initSite
+      Version -> versionOfSite
