@@ -67,12 +67,14 @@ Each blog post will be an `li` element (with the class `blog-post`) containing a
 
 Heckle will find all the `.tex` and `.pdf` file pairs in the `posts/` directory and aggregate links to them in your homepage. You will need to compile them yourself (with `pdflatex` probably) just like you normally would and make sure the resulting PDFs look nice. 
 
-**You need to ensure that you include a `\title` and a `\date` in the preamble of every LaTeX file**. Make sure you format the date as `\date{1 January 2016}` otherwise Heckle won't find your post! 
+**You need to ensure that you include a `\title` and a `\date` in the preamble of every LaTeX file:**
 
 ```tex
 \date{1 January 2015}
 \title{Example LaTeX Post}
 ```
+
+Valid date formats are [outlined below](#valid-date-formats).
 
 When you're satisfied, you can run `heckle build` again to update the blog. 
 
@@ -84,21 +86,29 @@ The `template.html.hkl` file is basically the layout file for your Markdown blog
 <div id="blog-post"></div>
 ```
 
-**You need to ensure that you include commented meta-data (outlined below) including the title, author, and date in every Markdown file**. Make sure you format the date as `1 January 2016` otherwise Heckle won't find your post! The first three lines of each markdown file need to be formatted as follows (the date format is `1 January 2016`):
+**You need to ensure that you include specific commented meta-data including the title, author, and date in every Markdown file**. The first three lines of each markdown file need to be formatted as follows:
 
 ```markdown
 % <TITLE>
 % <AUTHOR>
 % <FORMATTED-DATE>
-```
+``` 
+
+Valid date formats are [outlined below](#valid-date-formats).
 
 Heckle will find all the `.md` files and convert them to `.html` with the help of [Pandoc](http://pandoc.org/). Then it will insert the resulting HTML into your `template.html.hkl` file at the specified location. Finally, it aggregates links to all the posts in your homepage. 
 
 When you're satisfied, you can run `heckle build` again to update the blog. 
 
-###Notes
+##Valid Date Formats
 
-If you don't want to run `heckle build` every time you change a file, look into [SOS](https://github.com/schell/steeloverseer) or [Gulp](http://gulpjs.com/). 
+These are the valid date formats: 
+ - `1 January 2016`
+ - `January 1, 2016`
+ - `9:47AM 1 January 2016`
+ - `9:47AM January 1, 2016`
+
+ Feel free to mix and match between the formats. If you would like to support a different date format, let me know by opening [an issue](https://github.com/2016rshah/heckle#how-to).  
 
 #BlaTeX ?
 This project used to be called BlaTeX and was specifically for LaTeX/PDF posts (it did not support Markdown/HTML). It was created over the course of my senior year in high-school as my [senior research project](https://github.com/2016rshah/Meta-BlaTeX). Eventually I decided to [support Markdown as well](https://github.com/2016rshah/heckle/issues/5) and thus Heckle was born.
