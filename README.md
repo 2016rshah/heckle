@@ -16,7 +16,7 @@ Also, Jekyll was [too OP](https://jekyllrb.com/docs/structure/) for my taste. I 
 
 #How To
 
-First install [Heckle](https://hackage.haskell.org/package/heckle) by running `stack install heckle`. Then create the directory you want your blog to be based in, initialize a git repository, etc.
+First install [Heckle](https://hackage.haskell.org/package/heckle) by running `stack update && stack install heckle`. Then create the directory you want your blog to be based in, initialize a git repository, etc.
 
 When you're ready, from that directory run `heckle init`. That will create a skeleton file structure. 
 
