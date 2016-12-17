@@ -8,10 +8,8 @@ module Heckle where
 
 import Control.Applicative
 import Control.Monad
-import Data.Bifunctor
 import Data.Either
 import Data.Function (on)
-import Data.List
 import Data.List.Split (splitOn)
 import Data.String (IsString)
 import Data.Monoid
@@ -24,17 +22,8 @@ import Text.Blaze.Html.Renderer.Pretty
 import qualified Text.HTML.TagSoup as TagSoup
 
 import Data.Time
--- parseTimeM True defaultTimeLocale "%d %B %Y" "12 January 2016" :: Maybe UTCTime
 
---https://hackage.haskell.org/package/base-4.9.0.0/docs/Data-Maybe.html figure out how to optionally match either with hh:mm:ss or without it
---https://hackage.haskell.org/package/time-1.7/docs/Data-Time-Format.html
---http://hackage.haskell.org/package/time-1.7/docs/Data-Time-Clock.html#t:UTCTime
---https://hackage.haskell.org/package/time-1.7/docs/Data-Time-Format.html
---https://lotz84.github.io/haskellbyexample/ex/time-formatting-parsing
--- 
-
-
-import Text.Pandoc.Definition hiding (Format)
+import Text.Pandoc.Definition       hiding (Format)
 import Text.Pandoc.Options          (def)
 import Text.Pandoc.Readers.LaTeX    (readLaTeX)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
@@ -44,27 +33,8 @@ import Text.Pandoc.Writers.HTML     (writeHtmlString)
 instance Show Html where
   show = renderHtml
 
-data Month
-  = January
-  | February
-  | March
-  | April
-  | May
-  | June
-  | July
-  | August
-  | September
-  | October
-  | November
-  | December
-  deriving (Show, Eq, Bounded, Enum)
-
-month :: Int -> Month
-month n = toEnum (n-1)
-
 displayDate :: UTCTime -> String
-displayDate t = formatTime defaultTimeLocale "%-d %B %Y" t
-
+displayDate = formatTime defaultTimeLocale "%-d %B %Y"
 
 postsToHtml :: [Post] -> Html
 postsToHtml xs = do
@@ -78,7 +48,6 @@ postToHtml Post{..} = li ! class_ "blog-post" $ do
   where
     ext = getOutputExtension format
 
---data InputFormat =
 data Format = LaTeX | Markdown
   deriving (Show, Eq)
 
@@ -86,7 +55,6 @@ getOutputExtension :: Format -> String
 getOutputExtension LaTeX    = ".pdf"
 getOutputExtension Markdown = ".html"
 
--- data FileName = FileName { getFileName :: String, getExtension ::  }
 newtype Title = Title { getTitle :: String } 
   deriving (Show, Eq, IsString, ToMarkup)
 
@@ -108,13 +76,11 @@ parseAbsoluteDate s = case parseAbsoluteDate' s of
   Nothing -> Left "Date does not match valid formats"
 
 
-{--
-Valid formats:
-6 January 2012
-January 6, 2012
-9:47AM 6 January 2012
-9:47AM January 6, 2012
---}
+-- | Valid formats:
+-- | 6 January 2012
+-- | January 6, 2012
+-- | 9:47AM 6 January 2012
+-- | 9:47AM January 6, 2012
 parseAbsoluteDate' :: String -> Maybe UTCTime 
 parseAbsoluteDate' s = foldr (<|>) Nothing results  
   where

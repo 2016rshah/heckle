@@ -13,7 +13,6 @@ import System.Process     (readProcess)
 import Paths_heckle (version)
 import Data.Version (showVersion)
 
-
 import Heckle
 import Files
 
