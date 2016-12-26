@@ -4,11 +4,15 @@ import Control.Exception
 import Data.Either
 import Data.List
 import Data.Maybe
+import Control.Monad
 import Options.Applicative
 import System.Directory
 import System.FilePath
 import System.Environment (getArgs)
 import System.Process     (readProcess)
+
+import Data.Time
+import System.Environment
 
 import Paths_heckle (version)
 import Data.Version (showVersion)
@@ -42,6 +46,8 @@ mainFlags = withInfo (fullDesc <> progDesc "heckle: a simple, configurable stati
 
 buildSite :: IO ()
 buildSite = do
+
+  
   putStrLn "Reading directory and turning into native posts"
   postsToBeCreated <- mapM fileToPost =<< getDirectoryContents "posts"
   let posts = reverse . sort . rights $ postsToBeCreated
@@ -49,8 +55,17 @@ buildSite = do
 
   putStrLn "Writing markdown files into template HTML"
   template <- readFile "template.html.hkl"
-  sequence $ mapMaybe (writeHTML template) posts
-
+  lastBuiltString <- lookupEnv "HECKLE_BUILT"
+  putStrLn (show lastBuiltString)
+  let lastBuiltTime = ((fmap read lastBuiltString) :: (Maybe UTCTime))
+  putStrLn (show lastBuiltTime)
+  case lastBuiltTime of
+   Nothing -> sequence $ mapMaybe (writeHTML template) posts
+   Just t -> do
+     wereEdited <- filterM (edited t) posts
+     putStrLn $ "Only rebuilding " ++ (show (length wereEdited)) ++ " files that were edited"
+     sequence $ mapMaybe (writeHTML template) (wereEdited)
+   
   putStrLn "Creating HTML <ul> element for index file"
   let generatedHtml = postsToHtml posts
 
@@ -61,6 +76,9 @@ buildSite = do
     Nothing -> putStrLn "Error with templating"
     Just s  -> do
       writeFile "index.html" s
+      t <- getCurrentTime
+      putStrLn (show t)
+      setEnv "HECKLE_BUILT" (show t)
       putStrLn "Success building!"
 
 initSite :: IO ()

@@ -21,6 +21,7 @@ import Text.Blaze.Html.Renderer.Pretty
 
 import qualified Text.HTML.TagSoup as TagSoup
 
+import System.Directory
 import Data.Time
 
 import Text.Pandoc.Definition       hiding (Format)
@@ -29,6 +30,24 @@ import Text.Pandoc.Readers.LaTeX    (readLaTeX)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
 import Text.Pandoc.Shared           (stringify)
 import Text.Pandoc.Writers.HTML     (writeHtmlString)
+
+newtype Title = Title { getTitle :: String } 
+  deriving (Show, Eq, IsString, ToMarkup)
+
+data Format = LaTeX | Markdown
+  deriving (Show, Eq)
+
+data Post = Post
+  { fileName    :: String  -- TODO make this more typed
+  , postTitle   :: Title
+  , postDate    :: UTCTime
+  , format      :: Format
+  , pd          :: Pandoc
+  }  
+  deriving (Show, Eq)
+
+instance Ord Post where
+  compare = compare `on` postDate
 
 instance Show Html where
   show = renderHtml
@@ -47,28 +66,10 @@ postToHtml Post{..} = li ! class_ "blog-post" $ do
   H.div ! class_ "post-date" $ toHtml (displayDate postDate)
   where
     ext = getOutputExtension format
-
-data Format = LaTeX | Markdown
-  deriving (Show, Eq)
-
+    
 getOutputExtension :: Format -> String
 getOutputExtension LaTeX    = ".pdf"
 getOutputExtension Markdown = ".html"
-
-newtype Title = Title { getTitle :: String } 
-  deriving (Show, Eq, IsString, ToMarkup)
-
-data Post = Post
-  { fileName    :: String  -- TODO make this more typed
-  , postTitle   :: Title
-  , postDate    :: UTCTime
-  , format      :: Format
-  , pd          :: Pandoc
-  }  
-  deriving (Show, Eq)
-
-instance Ord Post where
-  compare = compare `on` postDate
 
 parseAbsoluteDate :: String -> Either String UTCTime
 parseAbsoluteDate s = case parseAbsoluteDate' s of
@@ -136,3 +137,8 @@ injectAt p layout insert = case splitOn p (TagSoup.parseTags layout) of
 writeHTML :: String -> Post -> Maybe (IO ())
 writeHTML template p@Post{..} =
   writeFile ("posts/" <> fileName <> ".html") <$> injectTemplate template p
+
+edited :: UTCTime -> Post -> IO Bool
+edited t Post{..} = do
+  modified <- (getModificationTime fileName)
+  return (modified > t)

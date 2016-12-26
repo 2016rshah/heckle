@@ -1,5 +1,5 @@
 name:                heckle
-version:             2.0.1.9
+version:             2.0.2.0
 synopsis:            Jekyll in Haskell (feat. LaTeX)
 description:         A static site generator that supports LaTeX-PDF and Markdown-HTML posts. Care has been taken to make it configurable, easy to use, and unopinionated.
 
@@ -44,5 +44,6 @@ executable heckle
                    , split >=0.2 && <0.3
                    , optparse-applicative >= 0.12.0.0 && <0.13.0.0
                    , optparse-generic ==1.1.*
+                   , time >= 1.6.0.0
   other-extensions:  OverloadedStrings
   default-language:  Haskell2010
