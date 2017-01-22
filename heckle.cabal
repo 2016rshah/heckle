@@ -23,7 +23,7 @@ library
   build-depends:     base >= 4.8 && <5
                    , filepath >= 1.4.0.0
                    , blaze-html >= 0.8.1.1
-                   , directory >=1.2 && <1.3
+                   , directory >=1.2 && <1.4
                    , process >= 1.2.0.0
                    , split >=0.2 && <0.3
                    , tagsoup >= 0.13.3
@@ -38,7 +38,7 @@ executable heckle
   other-modules:     Files
   build-depends:     base >=4.8 && <5
                    , heckle
-                   , directory >=1.2 && <1.3
+                   , directory >=1.2 && <1.4
                    , filepath >= 1.4.0.0
                    , process >= 1.2.0.0
                    , split >=0.2 && <0.3
