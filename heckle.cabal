@@ -42,7 +42,7 @@ executable heckle
                    , filepath >= 1.4.0.0
                    , process >= 1.2.0.0
                    , split >=0.2 && <0.3
-                   , optparse-applicative >= 0.12.0.0 && <0.13.0.0
+                   , optparse-applicative >= 0.12.0.0 && <0.14.0.0
                    , optparse-generic ==1.1.*
   other-extensions:  OverloadedStrings
   default-language:  Haskell2010

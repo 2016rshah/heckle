@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Main where
 
 import Control.Exception
@@ -12,6 +13,10 @@ import System.Process     (readProcess)
 
 import Paths_heckle (version)
 import Data.Version (showVersion)
+#if MIN_VERSION_optparse_applicative(0,13,0)
+-- versions before optparse-applicative-0.13 reexported (<>) themselves
+import Data.Monoid ((<>))
+#endif
 
 import Heckle
 import Files
