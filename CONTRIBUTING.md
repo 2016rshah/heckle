@@ -1,0 +1,4 @@
+ - Install everything you need
+ - Clone the repo
+ - `stack build` from the main folder
+ - `stack exec heckle build` from the example folder
