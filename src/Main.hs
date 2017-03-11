@@ -1,49 +1,22 @@
-{-# LANGUAGE CPP #-}
 module Main where
 
 import Control.Exception
 import Data.Either
 import Data.List
 import Data.Maybe
-import Options.Applicative
 import System.Directory
-import System.FilePath
+--import System.FilePath
 import System.Environment (getArgs)
 import System.Process     (readProcess)
 
 import Paths_heckle (version)
 import Data.Version (showVersion)
-#if MIN_VERSION_optparse_applicative(0,13,0)
--- versions before optparse-applicative-0.13 reexported (<>) themselves
 import Data.Monoid ((<>))
-#endif
+
 
 import Heckle
 import Files
 
-data Command
-  = Build
-  | Init
-  | Version
-
-withInfo :: InfoMod a -> Parser a -> ParserInfo a
-withInfo im p = info (helper <*> p) im
-
-infixr 1 ==>
-(==>) = withInfo . progDesc
-
-mainFlags :: ParserInfo Command
-mainFlags = withInfo (fullDesc <> progDesc "heckle: a simple, configurable static site generator") parser
-  where
-    parser :: Parser Command
-    parser = subparser $ mconcat
-      [ command "build" $ "Generate site"
-        ==> pure Build
-      , command "init" $ "Make new site template"
-        ==> pure Init
-      , command "version" $ "Get the package version"
-        ==> pure Version
-      ]
 
 buildSite :: IO ()
 buildSite = do
@@ -99,8 +72,10 @@ versionOfSite :: IO ()
 versionOfSite = putStrLn ("heckle " ++ showVersion version)
 
 main = do
-    command <- execParser mainFlags
-    case command of
-      Build -> buildSite
-      Init  -> initSite
-      Version -> versionOfSite
+    --command <- execParser mainFlags
+  args <- getArgs
+  case args of
+      "build":[] -> buildSite
+      "init":[] -> initSite
+      "version":[] -> versionOfSite
+      otherwise -> putStrLn "Command not recognized"

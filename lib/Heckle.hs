@@ -13,7 +13,8 @@ import Data.Function (on)
 import Data.List.Split (splitOn)
 import Data.String (IsString)
 import Data.Monoid
-import System.FilePath
+
+--import System.FilePath
 
 import Text.Blaze.Html5 as H hiding (main, map)
 import Text.Blaze.Html5.Attributes as A
@@ -106,12 +107,17 @@ createPost format fileName (Right pd) = do
   postDate  <- getMeta docDate pd >>= parseAbsoluteDate
   return Post{..}
 
+splitExtension :: String -> Maybe (String, String)
+splitExtension s = case splitOn "." s of
+  [a,b] -> Just (a, b)
+  _ -> Nothing
+
 fileToPost :: String -> IO (Either String Post)
 fileToPost fileName =
   case splitExtension fileName of
-    (name, ".pdf") ->
+    Just (name, "pdf") ->
       return . createPost LaTeX name . readLaTeX def =<< readFile ("posts/" <> name <> ".tex")
-    (name, ".md") ->
+    Just (name, "md") ->
       return . createPost Markdown name . readMarkdown def =<< readFile ("posts/" <> fileName)
     _ -> pure (Left "Not a LaTeX or MD file")
 
