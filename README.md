@@ -4,17 +4,17 @@ An easy to use static-site compiler written in Haskell that supports LaTeX/PDF *
 
 In other words Heckle is basically **Jekyll in Haskell (feat. LaTeX)**.
 
-#Why
+# Why
 
 Want to use Markdown? Cool. Want to use LaTeX? Cool. Want to use both? Cool. 
 
 Also, Jekyll was [too OP](https://jekyllrb.com/docs/structure/) for my taste. I just wanted to [throw some posts in a directory](https://github.com/2016rshah/heckle#how-to) and be ready to roll. [My own blog](http://www.rshah.org/blog/) uses Heckle with a ported version of [The Hyde Theme](https://github.com/poole/hyde) so it looks like a Jekyll blog, it's more simple to maintain, and it supports LaTeX posts. 
 
-#Requirements
+# Requirements
  - [The Haskell Platform](https://www.haskell.org/platform/)
  - [LaTeX](https://latex-project.org/ftp.html) (optional)
 
-#How To
+# How To
 
 First install [Heckle](https://hackage.haskell.org/package/heckle) by running `stack update && stack install heckle`. Then create the directory you want your blog to be based in, initialize a git repository, etc.
 
@@ -36,13 +36,13 @@ It'll look a little like this:
     └── example-markdown.md
 ```
 
-#Customizing
+# Customizing
 
 At this point, if you open the resulting `index.html` file, everything will look pretty awful. But luckily, you can customize just about everything. 
 
 (Also, if you want to get up and running quickly with [the Hyde theme](https://github.com/poole/hyde), follow the instructions in [this README](https://github.com/2016rshah/blog). It will look like [my blog](http://www.rshah.org/blog/) rather than just the skeleton and you can edit things from there.) 
 
-###Homepage
+### Homepage
 
 The `index.html.hkl` will basically be the layout you want for the homepage of your blog. Just make sure it is a valid HTML file (with Javascript, CSS, whatever you want) and make sure to keep the following HTML element wherever you want the list of your blog posts to go:
 
@@ -63,7 +63,7 @@ Each blog post will be an `li` element (with the class `blog-post`) containing a
 </li>
 ```
 
-###LaTeX Posts
+### LaTeX Posts
 
 Heckle will find all the `.tex` and `.pdf` file pairs in the `posts/` directory and aggregate links to them in your homepage. You will need to compile them yourself (with `pdflatex` probably) just like you normally would and make sure the resulting PDFs look nice. 
 
@@ -78,7 +78,7 @@ Valid date formats are [outlined below](#valid-date-formats).
 
 When you're satisfied, you can run `heckle build` again to update the blog. 
 
-###Markdown Posts
+### Markdown Posts
 
 The `template.html.hkl` file is basically the layout file for your Markdown blog posts. Just make sure it is a valid HTML file (with Javascript, CSS, whatever you want) and make sure to keep the following HTML element wherever you want your blog post content:
 
@@ -100,7 +100,7 @@ Heckle will find all the `.md` files and convert them to `.html` with the help o
 
 When you're satisfied, you can run `heckle build` again to update the blog. 
 
-##Valid Date Formats
+## Valid Date Formats
 
 These are the valid date formats: 
  - `1 January 2016`
@@ -110,10 +110,10 @@ These are the valid date formats:
 
 Feel free to mix and match between the formats. If you would like to support a different date format, let me know by opening [an issue](https://github.com/2016rshah/heckle/issues).  
 
-#BlaTeX ?
+# BlaTeX ?
 This project used to be called BlaTeX and was specifically for LaTeX/PDF posts (it did not support Markdown/HTML). It was created over the course of my senior year in high-school as my [senior research project](https://github.com/2016rshah/Meta-BlaTeX). Eventually I decided to [support Markdown as well](https://github.com/2016rshah/heckle/issues/5) and thus Heckle was born.
 
-#See also:
+# See also:
   - The Hackage package: https://hackage.haskell.org/package/heckle
   - PDFs are the future ?¿?: http://www.rshah.org/blog/posts/what-is-the-web.pdf
   - The Abstraction Progression of BlaTeX: http://www.rshah.org/blog/posts/abstraction-progression-blatex.pdf
