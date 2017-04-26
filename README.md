@@ -11,14 +11,24 @@ Want to use Markdown? Cool. Want to use LaTeX? Cool. Want to use both? Cool.
 Also, Jekyll was [too OP](https://jekyllrb.com/docs/structure/) for my taste. I just wanted to [throw some posts in a directory](https://github.com/2016rshah/heckle#how-to) and be ready to roll. [My own blog](http://www.rshah.org/blog/) uses Heckle with a ported version of [The Hyde Theme](https://github.com/poole/hyde) so it looks like a Jekyll blog, it's more simple to maintain, and it supports LaTeX posts. 
 
 # Requirements
+
+## For OSX
+ - [Homebrew](https://brew.sh/)
+ - [LaTeX](https://latex-project.org/ftp.html) (optional)
+
+## For everybody else
  - [The Haskell Platform](https://www.haskell.org/platform/)
  - [LaTeX](https://latex-project.org/ftp.html) (optional)
 
 # How To
 
-First install [Heckle](https://hackage.haskell.org/package/heckle) by running `stack update && stack install heckle`. Then create the directory you want your blog to be based in, initialize a git repository, etc.
+First you need to install [Heckle](https://hackage.haskell.org/package/heckle).
+ - If you have a mac the easiest way to do so is by running `brew install 2016rshah/tools/heckle`
+ - Alternatively if you want to develop heckle I suggest installing by running `stack update && stack install heckle`.
 
-When you're ready, from that directory run `heckle init`. That will create a skeleton file structure. 
+After you have heckle installed create the directory you want your blog to be based in (`mkdir blog`), initialize a git repository, etc.
+
+When you're ready, from inside your new directory run `heckle init`. That will create a skeleton file structure. 
 
 Now finally you can do `heckle build` to generate your site. If that succeeds, you will have the example blog up and running!
 
