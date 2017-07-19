@@ -14,7 +14,7 @@ import Data.List.Split (splitOn)
 import Data.String (IsString)
 import Data.Monoid
 
---import System.FilePath
+import System.Directory
 
 import Text.Blaze.Html5 as H hiding (main, map)
 import Text.Blaze.Html5.Attributes as A
@@ -30,6 +30,9 @@ import Text.Pandoc.Readers.LaTeX    (readLaTeX)
 import Text.Pandoc.Readers.Markdown (readMarkdown)
 import Text.Pandoc.Shared           (stringify)
 import Text.Pandoc.Writers.HTML     (writeHtmlString)
+
+data ParseDateError = ActuallyToday | NoParse
+  deriving Show
 
 instance Show Html where
   show = renderHtml
@@ -60,21 +63,24 @@ newtype Title = Title { getTitle :: String }
   deriving (Show, Eq, IsString, ToMarkup)
 
 data Post = Post
-  { fileName    :: String  -- TODO make this more typed
-  , postTitle   :: Title
-  , postDate    :: UTCTime
-  , format      :: Format
-  , pd          :: Pandoc
+  { fileName     :: String  -- TODO make this more typed
+  , postTitle    :: Title
+  , postDate     :: UTCTime
+  , lastModified :: UTCTime
+  , format       :: Format
+  , pd           :: Pandoc
   }  
   deriving (Show, Eq)
 
 instance Ord Post where
   compare = compare `on` postDate
 
-parseAbsoluteDate :: String -> Either String UTCTime
+parseAbsoluteDate :: String -> Either ParseDateError UTCTime
 parseAbsoluteDate s = case parseAbsoluteDate' s of
   Just a -> Right a
-  Nothing -> Left "Date does not match valid formats"
+  Nothing -> case s of
+    "\\today" -> Left ActuallyToday
+    _ -> Left NoParse
 
 
 -- | Valid formats:
@@ -99,12 +105,19 @@ createPost
   :: Show a
   => Format
   -> String
+  -> UTCTime
   -> Either a Pandoc
   -> Either String Post
-createPost _ _ (Left e) = Left (show e)
-createPost format fileName (Right pd) = do
+createPost _ _ _ (Left e) = Left (show e)
+createPost format fileName timestamp (Right pd) = do
   postTitle <- Title <$> getMeta docTitle pd
-  postDate  <- getMeta docDate pd >>= parseAbsoluteDate
+  dateText <- getMeta docDate pd
+  let lastModified = timestamp
+  let parsedDate = parseAbsoluteDate dateText
+  postDate <- case parsedDate of
+        Right a -> Right a
+        Left ActuallyToday -> Right lastModified
+        Left NoParse -> Left "No Parse" 
   return Post{..}
 
 splitExtension :: String -> Maybe (String, String)
@@ -115,10 +128,16 @@ splitExtension s = case splitOn "." s of
 fileToPost :: String -> IO (Either String Post)
 fileToPost fileName =
   case splitExtension fileName of
-    Just (name, "pdf") ->
-      return . createPost LaTeX name . readLaTeX def =<< readFile ("posts/" <> name <> ".tex")
-    Just (name, "md") ->
-      return . createPost Markdown name . readMarkdown def =<< readFile ("posts/" <> fileName)
+    Just (name, "pdf") -> do
+      let filePath = "posts/" <> name <> ".tex" 
+      fileText <- readFile filePath
+      fileTimestamp <- getModificationTime filePath
+      return (createPost LaTeX name fileTimestamp (readLaTeX def fileText))
+    Just (name, "md") -> do
+      let filePath = "posts/" <> fileName
+      fileText <- readFile filePath
+      fileTimestamp <- getModificationTime filePath
+      return (createPost Markdown name fileTimestamp (readMarkdown def fileText))
     _ -> pure (Left "Not a LaTeX or MD file")
 
 injectIndex :: String -> Html -> Maybe String
